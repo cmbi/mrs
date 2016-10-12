@@ -1,2 +1,2 @@
 cp -r /srv/files/* /srv/mrs-data
-mrs server start -p /var/run/mrs.pid --no-daemon
+while true; do mrs server start -p /var/run/mrs.pid --no-daemon; done

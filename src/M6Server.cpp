@@ -71,11 +71,11 @@ M6Server::M6Server(const zx::element* inConfig)
     , mAlignEnabled(false)
     , mConfigCopy(nullptr)
 {
-    LOG(Info,"M6Server: loading databanks..");
+    LOG(INFO,"M6Server: loading databanks..");
 
     LoadAllDatabanks();
 
-    LOG(Info,"M6Server: done loading databanks");
+    LOG(INFO,"M6Server: done loading databanks");
 
     set_docroot(M6Config::GetDirectory("docroot"));
 
@@ -2474,7 +2474,7 @@ void M6Server::handle_rest_find(const zh::request& request, const el::scope& sco
     }
 
     LOG(INFO, "handling rest find request for q=%s, db=%s, offset=%d, count=%d",
-              q.c_str(), db.c_str(), offset, count);
+              q.c_str(), db.c_str(), resultoffset, resultcount);
 
     if (q.empty())
         THROW(("No query specified"));
@@ -2510,7 +2510,7 @@ void M6Server::handle_rest_find(const zh::request& request, const el::scope& sco
     }
 
     LOG(INFO, "done generating rest find response for q=%s, db=%s, offset=%d, count=%d",
-              q.c_str(), db.c_str(), offset, count);
+              q.c_str(), db.c_str(), resultoffset, resultcount);
 }
 
 // --------------------------------------------------------------------

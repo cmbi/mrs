@@ -58,8 +58,7 @@ LDFLAGS				+= -pg
 OBJDIR				:= $(OBJDIR).profile
 endif
 
-UNIT_TESTS_SRC		= $(shell ls tests/unit/test_*.cpp)
-UNIT_TESTS			= $(UNIT_TESTS_SRC:tests/unit/test_%.cpp=./unit_test_%)
+UNIT_TESTS			= unit_test_blast
 TESTS				= $(UNIT_TESTS)
 
 VPATH += src
@@ -104,13 +103,13 @@ mrs: $(OBJECTS)
 	@ echo "$(CXX) -o $@ -I. $^ $(LDFLAGS)"
 	@ $(CXX) -o $@ -I. $^ $(LDFLAGS)
 
-./unit_test_blast: tests/unit/test_blast.cpp $(OBJDIR)/M6Blast.o \
+unit_test_blast: unit-tests/M6TestBlast.cpp $(OBJDIR)/M6Blast.o \
 		$(OBJDIR)/M6Matrix.o $(OBJDIR)/M6Error.o $(OBJDIR)/M6Progress.o \
 		$(OBJDIR)/M6Utilities.o
 	$(CXX) -o $@ -I src $^ $(LDFLAGS)
 
 run_tests: $(TESTS)
-	for test in $(TESTS); do $$test; done
+	for test in $(TESTS); do ./$$test; done
 
 $(OBJDIR)/%.o: %.cpp | $(OBJDIR)
 	@ echo ">>" $<

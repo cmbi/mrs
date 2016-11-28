@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(TestBlast1)
     bool filter = true, gapped = true;
     double expect = 10;
     std::vector<boost::filesystem::path> databanks;
-    databanks.push_back("tests/unit/data/cram_craab.fasta");
+    databanks.push_back("unit-tests/data/cram_craab.fasta");
 
     M6Blast::Result* r = M6Blast::Search(databanks, query, program, matrix,
                                          wordSize, expect, filter, gapped,

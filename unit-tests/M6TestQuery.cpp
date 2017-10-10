@@ -24,11 +24,11 @@ BOOST_AUTO_TEST_CASE(TestQuery1)
     bool isBooleanQuery;
     vector<string> terms;
 
-    cout << "parsing query\n";
-
     ParseQuery(*(databank.get()), "hyhel-5", true, terms, filter, isBooleanQuery);
 
-    cout << "got " << terms.size() << " terms from query\n";
-
+    BOOST_CHECK_EQUAL(1, terms.size());
     BOOST_CHECK_EQUAL(isBooleanQuery, false);
+
+    ParseQuery(*(databank.get()), "hyhel -5", true, terms, filter, isBooleanQuery);
+    BOOST_CHECK_EQUAL(2, terms.size());
 }

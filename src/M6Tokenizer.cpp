@@ -625,7 +625,7 @@ M6Token M6Tokenizer::GetNextWord()
                     state = 40;
                 break;
 
-            // matched a digit, allow only cardinals or an identifier starting with a digit
+            // matched a digit, allow only integers or an identifier starting with a digit
             case 20:
                 if (fast::isalpha(c))
                     state = 30;
@@ -634,7 +634,7 @@ M6Token M6Tokenizer::GetNextWord()
                     hasCombiningMarks = true;
                     state = 30;
                 }
-                else if (not fast::isdigit(c))
+                else if (not fast::isdigit(c) and c != '-')
                 {
                     Retract(*--t);
                     result = eM6TokenNumber;

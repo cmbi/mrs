@@ -305,7 +305,7 @@ void M6BlastCache::CacheResult(const string& inJobID, M6BlastResultPtr inResult)
         out.push(file);
 
         out << doc;
-        out.close();
+        file.close();
 
         // Place the job with requested id at the beginning of the list
         auto j = i;
@@ -451,7 +451,7 @@ void M6BlastCache::StoreJob(const string& inJobID, const M6BlastJob& inJob)
 
     fs::ofstream file(mCacheDir / (inJobID + ".job"), ios_base::out|ios_base::trunc);
     file << doc;
-    file.close()
+    file.close();
 }
 
 bool IsHighLoad (const M6BlastJob &job)

@@ -11,6 +11,7 @@
 #include <sys/resource.h>
 #endif
 
+#include <sstream>
 #include <iostream>
 #include <numeric>
 #include <cmath>
@@ -24,6 +25,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/random/random_device.hpp>
 #include <boost/chrono.hpp>
+#include <boost/stacktrace.hpp>
 
 #include <zeep/envelope.hpp>
 
@@ -3572,105 +3574,116 @@ void RunMainLoop(uint32 inNrOfThreads, bool redirectOutputToLog)
 {
     for (;;)
     {
-        if (redirectOutputToLog)
+        try
         {
-            LOG(DEBUG,"RunMainLoop: redirecting output to log");
-
-            // (re-)open the log files.
-            fs::path logfile = fs::path(M6Config::GetDirectory("log")) / "access.log";
-            fs::path errfile = fs::path(M6Config::GetDirectory("log")) / "error.log";
-            OpenLogFile(logfile.string(), errfile.string());
-        }
-
-        LOG(DEBUG,"RunMainLoop: importing namespaces");
-
-        using namespace boost::local_time;
-        using namespace boost::posix_time;
-
-        local_time_facet* lf(new local_time_facet("[%d/%b/%Y:%H:%M:%S %z]"));
-        cerr.imbue(std::locale(std::cout.getloc(), lf));
-        cerr << local_date_time(second_clock::local_time(), time_zone_ptr())
-             << " Restarting services...";
-
-        LOG(DEBUG,"RunMainLoop: blocking signals");
-
-        M6SignalCatcher catcher;
-        catcher.BlockSignals();
-
-        LOG(DEBUG,"RunMainLoop: get config");
-
-        const zx::element* config = M6Config::GetServer();
-        if (config == nullptr)
-            THROW(("Missing server configuration"));
-
-        string addr = config->get_attribute("addr");
-        string port = config->get_attribute("port");
-
-        if (port.empty())
-            port = "80";
-
-        LOG(DEBUG,"RunMainLoop: configuring server");
-
-        shared_ptr<M6Server> server(new M6Server(config));
-
-        LOG(DEBUG,"RunMainLoop: binding server to %s:%s",addr.c_str(),port.c_str());
-
-        server->bind(addr, boost::lexical_cast<uint16>(port));
-        boost::thread thread(boost::bind(&zeep::http::server::run, boost::ref(*server), inNrOfThreads));
-
-        cerr << " done" << endl
-             << local_date_time(second_clock::local_time(), time_zone_ptr())
-             << " listening at " << addr << ':' << port << endl;
-
-        LOG(DEBUG,"RunMainLoop: unblocking signals");
-
-        catcher.UnblockSignals();
-
-        LOG(DEBUG,"RunMainLoop: waiting for signals..");
-
-        int sig;
-        do
-        {
-            sig = catcher.WaitForSignal();
-
-            // signal logging
-            string sigstr;
-            switch(sig)
+            if (redirectOutputToLog)
             {
-            case SIGINT : sigstr = "SIGINT";  break;
-            case SIGHUP : sigstr = "SIGHUP";  break;
-            case SIGSEGV: sigstr = "SIGSEGV"; break;
-            case SIGQUIT: sigstr = "SIGQUIT"; break;
-            case SIGTERM: sigstr = "SIGTERM"; break;
-            default: sigstr = to_string(sig); break;
+                LOG(DEBUG,"RunMainLoop: redirecting output to log");
+
+                // (re-)open the log files.
+                fs::path logfile = fs::path(M6Config::GetDirectory("log")) / "access.log";
+                fs::path errfile = fs::path(M6Config::GetDirectory("log")) / "error.log";
+                OpenLogFile(logfile.string(), errfile.string());
             }
 
-            LOG(WARN,"RunMainLoop: recieved signal: %s",sigstr.c_str());
+            LOG(DEBUG,"RunMainLoop: importing namespaces");
 
-            //cerr << local_date_time(second_clock::local_time(), time_zone_ptr()) << " RunMainLoop recieved signal: " << sigstr << endl;
+            using namespace boost::local_time;
+            using namespace boost::posix_time;
+
+            local_time_facet* lf(new local_time_facet("[%d/%b/%Y:%H:%M:%S %z]"));
+            cerr.imbue(std::locale(std::cout.getloc(), lf));
+            cerr << local_date_time(second_clock::local_time(), time_zone_ptr())
+                 << " Restarting services...";
+
+            LOG(DEBUG,"RunMainLoop: blocking signals");
+
+            M6SignalCatcher catcher;
+            catcher.BlockSignals();
+
+            LOG(DEBUG,"RunMainLoop: get config");
+
+            const zx::element* config = M6Config::GetServer();
+            if (config == nullptr)
+                THROW(("Missing server configuration"));
+
+            string addr = config->get_attribute("addr");
+            string port = config->get_attribute("port");
+
+            if (port.empty())
+                port = "80";
+
+            LOG(DEBUG,"RunMainLoop: configuring server");
+
+            shared_ptr<M6Server> server(new M6Server(config));
+
+            LOG(DEBUG,"RunMainLoop: binding server to %s:%s",addr.c_str(),port.c_str());
+
+            server->bind(addr, boost::lexical_cast<uint16>(port));
+            boost::thread thread(boost::bind(&zeep::http::server::run, boost::ref(*server), inNrOfThreads));
+
+            cerr << " done" << endl
+                 << local_date_time(second_clock::local_time(), time_zone_ptr())
+                 << " listening at " << addr << ':' << port << endl;
+
+            LOG(DEBUG,"RunMainLoop: unblocking signals");
+
+            catcher.UnblockSignals();
+
+            LOG(DEBUG,"RunMainLoop: waiting for signals..");
+
+            int sig;
+            do
+            {
+                sig = catcher.WaitForSignal();
+
+                // signal logging
+                string sigstr;
+                switch(sig)
+                {
+                case SIGINT : sigstr = "SIGINT";  break;
+                case SIGHUP : sigstr = "SIGHUP";  break;
+                case SIGSEGV: sigstr = "SIGSEGV"; break;
+                case SIGQUIT: sigstr = "SIGQUIT"; break;
+                case SIGTERM: sigstr = "SIGTERM"; break;
+                default: sigstr = to_string(sig); break;
+                }
+
+                LOG(WARN,"RunMainLoop: recieved signal: %s",sigstr.c_str());
+
+                //cerr << local_date_time(second_clock::local_time(), time_zone_ptr()) << " RunMainLoop recieved signal: " << sigstr << endl;
+            }
+            while (sig == SIGCHLD); // we don't care about these in MRS server
+
+            server->stop();
+
+            LOG(DEBUG,"RunMainLoop: stopped server");
+
+            #ifdef BOOST_CHRONO_EXTENSIONS
+                if (not thread.try_join_for(boost::chrono::seconds(5)))
+            #else
+                if (not thread.timed_join(boost::posix_time::seconds(5)))
+            #endif
+            {
+                thread.interrupt();
+                thread.detach();
+            }
+
+            LOG(DEBUG,"RunMainLoop: ending iteration");
+
+            if (sig == SIGHUP)
+                continue;
+
+            break;
         }
-        while (sig == SIGCHLD); // we don't care about these in MRS server
-
-        server->stop();
-
-        LOG(DEBUG,"RunMainLoop: stopped server");
-
-#ifdef BOOST_CHRONO_EXTENSIONS
-        if (not thread.try_join_for(boost::chrono::seconds(5)))
-#else
-        if (not thread.timed_join(boost::posix_time::seconds(5)))
-#endif
+        catch(...)
         {
-            thread.interrupt();
-            thread.detach();
+            std::stringstream ss;
+            ss << boost::stacktrace::stacktrace();
+            LOG(ERROR, "RunMainLoop: %s", ss.str().c_str());
+
+            throw;
         }
-
-        LOG(DEBUG,"RunMainLoop: ending iteration");
-
-        if (sig == SIGHUP)
-            continue;
-
-        break;
     }
 }
 

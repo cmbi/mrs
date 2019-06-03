@@ -34,7 +34,7 @@ LIBS				= m pthread rt z bz2 zeep
 
 CXX					?= c++
 
-CXXFLAGS			+= -std=c++0x
+CXXFLAGS			+= -std=c++11
 CFLAGS				+= $(INCLUDE_DIR:%=-I%) -I. -pthread
 CFLAGS				+= -Wno-deprecated -Wno-multichar 
 CFLAGS				+= $(shell $(PERL) -MExtUtils::Embed -e perl_inc)

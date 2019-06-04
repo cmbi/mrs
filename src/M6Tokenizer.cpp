@@ -603,6 +603,7 @@ M6Token M6Tokenizer::GetNextWord()
 
         switch (state)
         {
+            // Nothing matched yet
             case 10:
                 if (c == 0)
                     result = eM6TokenEOF;
@@ -623,6 +624,7 @@ M6Token M6Tokenizer::GetNextWord()
                     result = eM6TokenPunctuation;
                 else
                     state = 40;
+
                 break;
 
             // matched a digit, allow only integers or an identifier starting with a digit
@@ -715,9 +717,9 @@ M6Token M6Tokenizer::GetNextQueryToken()
             case 10:
                 switch (c)
                 {
-                    case 0:        result = eM6TokenEOF; break;
-//                    case '-':    result = eM6TokenHyphen; break;
-//                    case '+':    result = eM6TokenPlus; break;
+                    case 0:      result = eM6TokenEOF; break;
+//                  case '-':    result = eM6TokenHyphen; break;
+//                  case '+':    result = eM6TokenPlus; break;
                     case '(':    result = eM6TokenOpenParenthesis; break;
                     case ')':    result = eM6TokenCloseParenthesis; break;
                     case '[':    result = eM6TokenOpenBracket; break;
@@ -798,13 +800,18 @@ M6Token M6Tokenizer::GetNextQueryToken()
                 break;
 
             case 203: // previous char was digit
-                if (c == '.')
+                if (c == 0)
+                {
+                    Retract(*--t);
+                    result = eM6TokenNumber;
+                    break;
+                }
+                else if (c == '.')
                     state = 204;
                 else if (c == 'e' or c == 'E')
                     state = 205;
                 else
                     Restart(20);
-                break;
 
             case 204:
                 if (c == 'e' or c == 'E')
@@ -824,7 +831,13 @@ M6Token M6Tokenizer::GetNextQueryToken()
                 // otherwise fall through
 
             case 206: // previous was float pattern: [0-9][Ee][-+]?
-                if (c >= '0' and c <= '9')
+                if (c == 0)
+                {
+                    Retract(*--t);
+                    result = eM6TokenFloat;
+                    break;
+                }
+                else if (c >= '0' and c <= '9')
 
                     state = 207;
                 else
@@ -832,7 +845,6 @@ M6Token M6Tokenizer::GetNextQueryToken()
                        It might be a [0-9] number though.
                      */
                     Restart(20);
-                break;
 
             case 207: // previous was float pattern: [0-9][Ee][-+]?[0-9]
                 if (c < '0' or c > '9')

@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(TestQuery1)
 BOOST_AUTO_TEST_CASE(TestQuery2)
 {
     vector<pair<string,string>> indexNames;
-    unique_ptr<M6Databank> databank(M6Databank::CreateNew("test-pdbfinder", "test/test-pdbfinder.m6", "0.0.0", indexNames));
+    unique_ptr<M6Databank> databank(M6Databank::CreateNew("test-pdbfinder", "test/test-db.m6", "0.0.0", indexNames));
 
     M6Iterator* filter = nullptr;
     bool isBooleanQuery;

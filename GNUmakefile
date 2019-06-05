@@ -22,7 +22,7 @@ MRS_PORT			?= 18090
 MRS_BASE_URL		?= http://chelonium.cmbi.umcn.nl:$(MRS_PORT)/
 MRS_USER			?= $(shell whoami)
 
-PERL				?= $(which perl)
+PERL				?= $(shell which perl)
 
 DEFINES				+= MRS_ETC_DIR='"$(MRS_ETC_DIR)"' \
 					   MRS_USER='"$(MRS_USER)"' \
@@ -36,7 +36,7 @@ CXX					?= c++
 
 CXXFLAGS			+= -std=c++11
 CFLAGS				+= $(INCLUDE_DIR:%=-I%) -I. -pthread
-CFLAGS				+= -Wno-deprecated -Wno-multichar 
+CFLAGS				+= -Wno-deprecated -Wno-multichar
 CFLAGS				+= $(shell $(PERL) -MExtUtils::Embed -e perl_inc)
 CFLAGS				+= $(DEFINES:%=-D%)
 
@@ -58,12 +58,12 @@ LDFLAGS				+= -pg
 OBJDIR				:= $(OBJDIR).profile
 endif
 
-INTEGRATION_TESTS	= integration_test_databanks
-UNIT_TESTS			= unit_test_blast unit_test_query unit_test_exec
+INTEGRATION_TESTS	= integration_test_databank
+UNIT_TESTS			= unit_test_blast unit_test_token unit_test_query unit_test_exec
 TESTS				= $(UNIT_TESTS) $(INTEGRATION_TESTS)
 
 
-VPATH += src unit-tests
+VPATH += src unit-tests integration-tests
 
 OBJECTS = \
 	$(OBJDIR)/M6BitStream.o \
@@ -110,7 +110,11 @@ integration_test_databank: $(OBJDIR)/M6TestDatabank.o $(OBJDIR)/M6Databank.o \
 		$(OBJDIR)/M6Error.o $(OBJDIR)/M6Index.o $(OBJDIR)/M6File.o \
 		$(OBJDIR)/M6BitStream.o $(OBJDIR)/M6Progress.o $(OBJDIR)/M6Tokenizer.o \
 		$(OBJDIR)/M6DocStore.o $(OBJDIR)/M6Utilities.o $(OBJDIR)/M6Dictionary.o \
-		$(OBJDIR)/M6Query.o
+		$(OBJDIR)/M6Query.o $(OBJDIR)/M6Builder.o $(OBJDIR)/M6Progress.o \
+		$(OBJDIR)/M6Exec.o $(OBJDIR)/M6Log.o $(OBJDIR)/M6Config.o $(OBJDIR)/M6Parser.o \
+		$(OBJDIR)/M6DataSource.o $(OBJDIR)/M6Server.o $(OBJDIR)/M6BlastCache.o \
+		$(OBJDIR)/M6Blast.o $(OBJDIR)/M6WSBlast.o $(OBJDIR)/M6WSSearch.o $(OBJDIR)/M6Matrix.o \
+		$(OBJDIR)/M6Fetch.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 unit_test_blast: $(OBJDIR)/M6TestBlast.o $(OBJDIR)/M6Blast.o \
@@ -124,6 +128,9 @@ unit_test_query:  $(OBJDIR)/M6TestQuery.o $(OBJDIR)/M6Query.o \
 		$(OBJDIR)/M6File.o $(OBJDIR)/M6Progress.o $(OBJDIR)/M6DocStore.o \
 		$(OBJDIR)/M6Document.o $(OBJDIR)/M6Lexicon.o $(OBJDIR)/M6Dictionary.o \
 		$(OBJDIR)/M6Utilities.o
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+unit_test_token: $(OBJDIR)/M6TestTokenizer.o $(OBJDIR)/M6Tokenizer.o $(OBJDIR)/M6Error.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 unit_test_exec: $(OBJDIR)/M6TestExec.o $(OBJDIR)/M6Exec.o $(OBJDIR)/M6Error.o \

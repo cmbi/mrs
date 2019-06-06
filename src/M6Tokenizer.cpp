@@ -799,25 +799,31 @@ M6Token M6Tokenizer::GetNextQueryToken()
                 }
                 break;
 
-            case 203: // previous char was digit
-                if (c == 0)
-                {
-                    Retract(*--t);
-                    result = eM6TokenNumber;
-                    break;
-                }
-                else if (c == '.')
+            case 203: // parsing a number, previous char was digit
+                if (c == '.')
                     state = 204;
                 else if (c == 'e' or c == 'E')
                     state = 205;
+                else if (c >= '0' and c <= '9')
+                    state = 203;
+                else if (c == 0)
+                {
+                    Retract(*--t);
+                    result = eM6TokenNumber;
+                }
                 else
                     Restart(20);
 
-            case 204:
+                break;
+
+            case 204:  // previously seen digit, followed by dot
                 if (c == 'e' or c == 'E')
                     state = 205;
+
                 else if (c < '0' or c > '9')
                 {
+                    // not a digit, number ends
+
                     Retract(*--t);
                     result = eM6TokenFloat;
                 }
@@ -831,13 +837,7 @@ M6Token M6Tokenizer::GetNextQueryToken()
                 // otherwise fall through
 
             case 206: // previous was float pattern: [0-9][Ee][-+]?
-                if (c == 0)
-                {
-                    Retract(*--t);
-                    result = eM6TokenFloat;
-                    break;
-                }
-                else if (c >= '0' and c <= '9')
+                if (c >= '0' and c <= '9')
 
                     state = 207;
                 else
@@ -845,6 +845,8 @@ M6Token M6Tokenizer::GetNextQueryToken()
                        It might be a [0-9] number though.
                      */
                     Restart(20);
+
+                break;
 
             case 207: // previous was float pattern: [0-9][Ee][-+]?[0-9]
                 if (c < '0' or c > '9')

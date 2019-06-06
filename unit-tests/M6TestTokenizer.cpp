@@ -18,7 +18,9 @@ int VERBOSE = 0;
 
 BOOST_AUTO_TEST_CASE(TestParse1)
 {
-    M6Tokenizer tokenizer(std::string("resolution < 1.2"));
+    std::string queryString = "resolution < 1.2";
+
+    M6Tokenizer tokenizer(queryString);
 
     BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenWord);
     BOOST_CHECK_EQUAL(tokenizer.GetTokenString(), "resolution");
@@ -31,14 +33,16 @@ BOOST_AUTO_TEST_CASE(TestParse1)
 
 BOOST_AUTO_TEST_CASE(TestParse2)
 {
-    M6Tokenizer tokenizer("resolution<1.2");
+    std::string queryString = "resolution<111";
+
+    M6Tokenizer tokenizer(queryString);
 
     BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenWord);
     BOOST_CHECK_EQUAL(tokenizer.GetTokenString(), "resolution");
 
     BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenLessThan);
 
-    BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenFloat);
-    BOOST_CHECK_EQUAL(tokenizer.GetTokenString(), "1.2");
+    BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenNumber);
+    BOOST_CHECK_EQUAL(tokenizer.GetTokenString(), "111");
 }
 

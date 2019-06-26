@@ -32,7 +32,11 @@ BOOST_AUTO_TEST_CASE(TestDatabank1)
     bool ranked;
     std::string parseError;
 
-    server.Find(dbName, "Exp-Method:X", true, 0, 10, true,
+    server.Find(dbName, "1xxx", true, 0, 10, true,
+                hits, hitCount, ranked, parseError);
+    BOOST_CHECK(hitCount > 0);
+
+    server.Find(dbName, "exp_method:x", true, 0, 10, true,
                 hits, hitCount, ranked, parseError);
     BOOST_CHECK(hitCount > 0);
 
@@ -43,4 +47,8 @@ BOOST_AUTO_TEST_CASE(TestDatabank1)
     server.Find(dbName, "Resolution > 1.2", true, 0, 10, true,
                 hits, hitCount, ranked, parseError);
     BOOST_CHECK(hitCount <= 0);
+
+    server.Find(dbName, "hssp_n_align > 100", true, 0, 10, true,
+                hits, hitCount, ranked, parseError);
+    BOOST_CHECK(hitCount > 0);
 }

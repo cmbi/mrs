@@ -133,9 +133,10 @@ M6BlastCache::M6BlastCache()
 		}
 	}
 
-	// finally start the worker thread
+	// finally start the worker threads
 	mStopWorkingFlag = false;
 	mWorkerThread = boost::thread([this](){ this->Work(); });
+    mHighLoadThread = boost::thread([this](){ this->Work (true); });
 
 	LOG(DEBUG,"M6BlastCache has been created");
 }
@@ -151,7 +152,7 @@ M6BlastCache::~M6BlastCache()
 	}
 }
 
-string statusToString(M6BlastJobStatus status) {
+string StatusToString(M6BlastJobStatus status) {
 
 	switch(status) {
 	case bj_Unknown:
@@ -165,7 +166,7 @@ string statusToString(M6BlastJobStatus status) {
 	case bj_Error:
 		return "error";
 	default:
-		return ""; 
+		return to_string(status);
 	}
 }
 
@@ -362,7 +363,7 @@ string M6BlastCache::Submit(const string& inDatabank, const string& inQuery,
 			e.status = bj_Queued;
 			StoreJob(e.id, e.job);	// need to store the job again, since the timestamps changed
 
-			mWorkCondition.notify_one();
+			mWorkCondition.notify_all();
 			
 			// clean up stale files
 			if (fs::exists(mCacheDir / (e.id + ".xml.bz2")))
@@ -416,7 +417,7 @@ string M6BlastCache::Submit(const string& inDatabank, const string& inQuery,
 		
 		// New jobs are added to the front, because jobs at the back are first to be removed when the queue is full.
 		mResultCache.push_front(e);
-		mWorkCondition.notify_one();
+		mWorkCondition.notify_all();
 
 		result = e.id;
 
@@ -436,11 +437,29 @@ void M6BlastCache::StoreJob(const string& inJobID, const M6BlastJob& inJob)
 	file << doc;
 }
 
-void M6BlastCache::Work()
+bool IsHighLoad (const M6BlastJob &job)
+{
+    // query sequence length:
+    if (job.query.length () > 1e4)
+        return true;
+
+    // Database files contain fasta format sequences (uncompressed)
+    for (const M6BlastDbInfo& dbi : job.files)
+    {
+        uintmax_t size = fs::file_size (dbi.path);
+
+        if (size > 1e9) // larger than a gigabyte
+            return true;
+    }
+
+    return false;
+}
+
+void M6BlastCache::Work(const bool highload)
 {
 	using namespace boost::posix_time;
 
-	boost::mutex::scoped_lock lock(mWorkMutex);
+	boost::mutex::scoped_lock lock(highload? mHighLoadMutex: mWorkMutex);
 
 	while (not mStopWorkingFlag)
 	{
@@ -455,6 +474,14 @@ void M6BlastCache::Work()
 				{
 					if (e.status != bj_Queued)
 						continue;
+
+                    /*
+                        The highload thread must only do highload jobs,
+                        the normal thread must only do normal jobs.
+                     */
+                    if (highload != IsHighLoad (e.job))
+                        continue;
+
 					next = e.id;
 					break;
 				}
@@ -481,6 +508,22 @@ void M6BlastCache::Work()
 	}
 }
 
+bool M6BlastCache::LoadCacheJob (const std::string& inJobID, M6BlastJob& job)
+{
+    boost::mutex::scoped_lock lock(mCacheMutex);
+
+    fs::ifstream file(mCacheDir / (inJobID + ".job"));
+    if (file.is_open())
+    {
+        zeep::xml::document doc(file);
+        doc.deserialize("blastjob", job);
+
+        return true;
+    }
+
+    return false;
+}
+
 void M6BlastCache::ExecuteJob(const string& inJobID)
 {
 	try
@@ -489,16 +532,10 @@ void M6BlastCache::ExecuteJob(const string& inJobID)
 		
 		M6BlastJob job;
 	
-		fs::ifstream file(mCacheDir / (inJobID + ".job"));
-		if (not file.is_open())
+        if (!LoadCacheJob (inJobID, job))
 		{
 			SetJobStatus(inJobID, bj_Error);
 			return;
-		}
-		
-		{
-			zeep::xml::document doc(file);
-			doc.deserialize("blastjob", job);
 		}
 		
 		vector<fs::path> files;
@@ -604,5 +641,5 @@ void M6BlastCache::DeleteJob(const string& inJobID)
 		fs::remove(mCacheDir / (inJobID + ext), ec);
 	}
 	
-	mWorkCondition.notify_one();
+	mWorkCondition.notify_all();
 }

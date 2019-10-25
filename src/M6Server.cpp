@@ -200,6 +200,7 @@ M6Server::M6Server(const zx::element* inConfig)
 
 	mount("rest",			boost::bind(&M6Server::handle_rest, this, _1, _2, _3));
 
+    mount("dtd/mrs-config.dtd", boost::bind(&M6Server::handle_file, this, _1, _2, _3));
 	mount("favicon.ico",	boost::bind(&M6Server::handle_file, this, _1, _2, _3));
 	mount("robots.txt",		boost::bind(&M6Server::handle_file, this, _1, _2, _3));
 
@@ -3304,7 +3305,7 @@ void M6Server::handle_blast_submit_ajax(
 		}
 		else
 		{
-				if (not ba::all(query, ba::is_any_of("LAGSVETKDPIRNQFYMHCWBZXUO")))
+			if (not ba::all(query, ba::is_any_of("LAGSVETKDPIRNQFYMHCWBZXUO")))
 			{
 				PRINT(("Error in parameters:\n%s", request.payload.c_str()));
 				THROW(("not a valid sequence"));
@@ -3581,16 +3582,16 @@ void M6Server::handle_info(const zh::request& request, const el::scope& scope, z
 
 		LOG(INFO, "handling info request for db=%s", dbAlias.c_str());
 
-	if (dbAlias.empty())
+	    if (dbAlias.empty())
 		{
-		THROW(("No databank specified"));
+		    THROW(("No databank specified"));
 		}
 
 		LOG (DEBUG, "M6Server: info request is for databank %s", dbAlias.c_str ());
 
-	vector<string> aliased = UnAlias(dbAlias);
-		bool bAlias = aliased.size()>1 ||
-						aliased.size () == 1 && aliased[0] != dbAlias ;
+	    vector<string> aliased = UnAlias(dbAlias);
+		bool bAlias = aliased.size() > 1 ||
+						aliased.size() == 1 && aliased[0] != dbAlias ;
 
 	vector<el::object> databanks;
 	for (string db : aliased)

@@ -2935,7 +2935,7 @@ M6Iterator* M6IndexImplT<M6MultiIDLData>::FindString(const string& inString)
 			if (token == eM6TokenEOF)
 				break;
 			
-			if (token == eM6TokenWord or token == eM6TokenNumber)
+			if (token == eM6TokenWord or token == eM6TokenNumber or token == eM6TokenFloat)
 			{
 				if (not root->Find(tokenizer.GetTokenString(), data))
 				{

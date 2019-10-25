@@ -42,7 +42,6 @@
 #include "M6Progress.h"
 #include "M6DataSource.h"
 #include "M6Queue.h"
-#include "M6Config.h"
 #include "M6Exec.h"
 #include "M6Parser.h"
 #include "M6Utilities.h"
@@ -549,11 +548,13 @@ void M6Processor::Process(vector<fs::path>& inFiles, M6Progress& inProgress,
 	}
 	else
 	{
-		if (inNrOfThreads > inFiles.size())
-			inNrOfThreads = static_cast<uint32>(inFiles.size());
+        if (inNrOfThreads > inFiles.size())
+            inNrOfThreads = static_cast<uint32>(inFiles.size());
 
-		for (uint32 i = 0; i < inNrOfThreads; ++i)
-			mFileThreads.create_thread([&inProgress, this]() { this->ProcessFile(inProgress); });
+        for (uint32 i = 0; i < inNrOfThreads; ++i)
+            mFileThreads.create_thread(
+                [&inProgress, this]() { this->ProcessFile(inProgress); }
+            );
 
 		for (fs::path& file : inFiles)
 		{
@@ -570,6 +571,9 @@ void M6Processor::Process(vector<fs::path>& inFiles, M6Progress& inProgress,
 		}
 
 		mFileQueue.Put(fs::path());
+
+        // Now all the input files have been added to the queue.
+
 		mFileThreads.join_all();
 	}
 	

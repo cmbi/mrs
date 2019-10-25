@@ -218,7 +218,7 @@ void M6InputDocument::Index(const string& inIndex, M6DataType inDataType,
 #endif
 			assert(l > 0);
 			
-			if ((token == eM6TokenNumber and not inIndexNumbers) or
+			if (((token == eM6TokenNumber or token == eM6TokenFloat) and not inIndexNumbers) or
 				token == eM6TokenPunctuation or
 				l > kM6MaxKeyLength)
 			{
@@ -227,7 +227,7 @@ void M6InputDocument::Index(const string& inIndex, M6DataType inDataType,
 				continue;
 			}
 			
-			if (token != eM6TokenNumber and token != eM6TokenWord)
+			if (token != eM6TokenNumber and token != eM6TokenFloat and token != eM6TokenWord)
 				continue;
 			
 			uint32 t = mDocLexicon.Store(tokenizer.GetTokenValue(), l);

@@ -54,7 +54,7 @@ namespace ba = boost::algorithm;
 namespace pt = boost::posix_time;
 namespace po = boost::program_options;
 
-const string kM6ServerNS = "https://mrs.cmbi.ru.nl/mrs-web/ml";
+const string kM6ServerNS = "https://mrs.cmbi.umcn.nl/mrs-web/ml";
 
 // --------------------------------------------------------------------
 
@@ -2004,7 +2004,7 @@ void M6Server::ProcessNewConfig(const string& inPage, const zh::request& request
 				{
 					e = new zx::element("web-service");
 					e->set_attribute("service", ws);
-					e->set_attribute("ns", string("https://mrs.cmbi.ru.nl/mrsws/") + ws);
+					e->set_attribute("ns", string("https://mrs.cmbi.umcn.nl/mrsws/") + ws);
 					server->append(e);
 				}
 				e->set_attribute("location", s);

@@ -83,8 +83,8 @@ sub Parse
 	# never mind what's in the getProteinCount file...
 	
 	# Retrieving and processing the WSDL
-	my $ws_url = 'http://cmbi23.cmbi.ru.nl:8080/mcsis-web/webservice/';
-	$ws_url = 'http://cmbi23.cmbi.ru.nl:8080/mcsis-web-nrdb/webservice/'
+	my $ws_url = 'http://cmbi23.cmbi.umcn.nl:8080/mcsis-web/webservice/';
+	$ws_url = 'http://cmbi23.cmbi.umcn.nl:8080/mcsis-web-nrdb/webservice/'
 		if ($self->{db} eq 'nucleardb');
 	
 	my $wsdl  = XML::LibXML->new->parse_file("$ws_url/?wsdl");

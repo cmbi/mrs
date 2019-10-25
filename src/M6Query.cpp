@@ -167,7 +167,7 @@ M6Iterator* M6QueryParser::ParseTest()
 				if (token == eM6TokenEOF)
 					break;
 					
-				if (token == eM6TokenWord or token == eM6TokenNumber)
+				if (token == eM6TokenWord or token == eM6TokenNumber or token == eM6TokenFloat)
 					mQueryTerms.push_back(tokenizer.GetTokenString());
 			}
 
@@ -217,7 +217,7 @@ M6Iterator* M6QueryParser::ParseTest()
 
 					Match(eM6TokenPunctuation);
 					
-					if (mLookahead != eM6TokenWord and mLookahead != eM6TokenNumber)
+					if (mLookahead != eM6TokenWord and mLookahead != eM6TokenNumber and mLookahead != eM6TokenFloat)
 						break;
 					
 					mQueryTerms.push_back(mTokenizer.GetTokenString());
@@ -374,7 +374,7 @@ M6Iterator* M6QueryParser::ParseTerm(const string& inIndex)
 				if (token == eM6TokenEOF)
 					break;
 					
-				if (token == eM6TokenWord or token == eM6TokenNumber)
+				if (token == eM6TokenWord or token == eM6TokenNumber or token == eM6TokenFloat)
 					mQueryTerms.push_back(tokenizer.GetTokenString());
 			}
 
@@ -422,7 +422,7 @@ M6Iterator* M6QueryParser::ParseBooleanTerm(const string& inIndex, M6QueryOperat
 				if (token == eM6TokenEOF)
 					break;
 					
-				if (token == eM6TokenWord or token == eM6TokenNumber)
+				if (token == eM6TokenWord or token == eM6TokenNumber or token == eM6TokenFloat)
 					mQueryTerms.push_back(tokenizer.GetTokenString());
 			}
 

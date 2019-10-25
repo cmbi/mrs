@@ -1,6 +1,8 @@
+Changes in MRS version 6.1.1
+
 Changes in MRS version 6.1.0
 
-- REplaced cmbi.ru.nl by cmbi.umcn.nl
+- Replaced cmbi.ru.nl by cmbi.umcn.nl
 - Several bugs in the search algorithm have been fixed.
 - The search algorithm now allows to search by alias. Like uniprot, representing trembl + sprot.
 - The index page has been fixed to show all sections and entries.

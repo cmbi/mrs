@@ -6,7 +6,7 @@ WORKDIR /app
 RUN apt-get update
 RUN apt-get install -y clustalo ncbi-tools-bin
 RUN apt-get install -y make rsync wget
-RUN apt-get install -y git g++ libz-dev libbz2-dev bzip2 doxygen xsltproc docbook docbook-xsl docbook-xml autoconf automake autotools-dev liblog4cpp5-dev libperl-dev
+RUN apt-get install -y git g++ libz-dev libbz2-dev bzip2 doxygen xsltproc docbook docbook-xsl docbook-xml autoconf automake autotools-dev libperl-dev
 RUN mkdir -p /deps
 
 # Install boost 1.65

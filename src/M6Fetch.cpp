@@ -712,6 +712,7 @@ void M6RSyncFetcherImpl::Mirror(bool inDryRun, ostream& out)
 	zx::element* source = mConfig->find_first("source");
 	string srcdir = source->content();
 
+    string port = source->get_attribute("port");
 	string rsync = M6Config::GetTool("rsync");
 	if (not fs::exists(rsync))
 		THROW(("rsync not found"));
@@ -726,7 +727,7 @@ void M6RSyncFetcherImpl::Mirror(bool inDryRun, ostream& out)
 	if (!source->get_attribute("port").empty())
 	{
 		args.push_back("--port");
-		args.push_back(source->get_attribute("port").c_str());
+		args.push_back(port.c_str());
 	}
 	if (inDryRun)
 		args.push_back("--dry-run");
@@ -795,7 +796,9 @@ void M6RSyncFetcherImpl::Mirror(bool inDryRun, ostream& out)
 	args.push_back(srcdir.c_str());
 	args.push_back(nullptr);
 	
-	for_each(args.begin(), args.end(), [](const char* arg) { if (arg != nullptr) cout << arg << ' '; });
+    for (const char *arg : args)
+	    if (arg != nullptr)
+            cout << arg << ' ';
 	cout << endl;
 
 	stringstream in;

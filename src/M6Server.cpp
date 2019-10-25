@@ -2324,8 +2324,7 @@ void M6Server::handle_admin(const zh::request& request,
 		}
 		else
 		{
-#warning("fixme")
-				ProcessNewConfig(submitted, request);
+			ProcessNewConfig(submitted, request);
 			reply = zh::reply::redirect("admin");
 		}
 		return;

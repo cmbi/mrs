@@ -198,7 +198,7 @@ tuple<M6BlastJobStatus,string,uint32,double> M6BlastCache::JobStatus(const strin
 	
 	if (i != mResultCache.end()) // is requested job id in list ?
 	{
-		LOG(DEBUG,"M6BlastCache::JobStatus: matched job %s with status %s",inJobID.c_str(),statusToString(i->status).c_str());
+		LOG(DEBUG,"M6BlastCache::JobStatus: matched job %s with status %s",inJobID.c_str(),StatusToString(i->status).c_str());
 
 		get<0>(result) = i->status;
 		
@@ -246,7 +246,7 @@ tuple<M6BlastJobStatus,string,uint32,double> M6BlastCache::JobStatus(const strin
 			mResultCache.splice(mResultCache.begin(), mResultCache, i, j);
 	}
 	
-	LOG(DEBUG,"M6BlastCache::JobStatus: returning status %s for job %s",statusToString(i->status).c_str(),inJobID.c_str());
+	LOG(DEBUG,"M6BlastCache::JobStatus: returning status %s for job %s",StatusToString(i->status).c_str(),inJobID.c_str());
 
 	return result;
 }

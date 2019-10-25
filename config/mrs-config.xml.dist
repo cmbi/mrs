@@ -175,7 +175,6 @@
       <info>http://www.cmbi.umcn.nl/pdb_redo</info>
       <source delete="true" fetch="rsync://rsync.pdb-redo.eu/pdb-redo/" recursive="true">pdb_redo/??/????/????_final.pdb</source>
     </databank>
-    </databank>
     <databank id="pdb" parser="pdb" enabled="true" update="daily" fasta="true">
       <name>PDB</name>
       <info>http://www.rcsb.org/pdb/</info>

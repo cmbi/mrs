@@ -25,6 +25,7 @@ sub parse
 		{
 			$title = substr($line, 10, 40);
 			my $id = substr($line, 62, 4);
+            next if ($id eq '    ');
 
 			$self->index_unique_string('id', $id);
 			$self->set_attribute('id', $id);

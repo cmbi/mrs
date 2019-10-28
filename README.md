@@ -31,11 +31,11 @@ relative path, MRS will prepend it with the 'raw files' directory specified
 in the Main tab. If the path is absolute however, it will take this path
 directly. So we enter for Source files:
 
-    /home/me/mrs-6.0.0/*.{cpp,h,inl,c}
+    /home/me/mrs-6/*.{cpp,h,inl,c}
 
 Now if you tick the Recursive checkbox, MRS will include all files that have
 a name that ends with either .cpp, .h, .inl or .c found in any directory
-under /home/me/mrs-6.0.0/.
+under /home/me/mrs-6/.
 
 As parser use the generic parser. This parser simply indexes all text and
 assigns an incrementing number as ID to each document. It assumes each file

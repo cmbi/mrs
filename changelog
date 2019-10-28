@@ -1,4 +1,9 @@
-Changes in MRS version 6.1.1
+Changes in MRS version 6.1.4
+
+- Allows floating point numbers to be indexed. Example: resolution.
+- Placed https in the urls, instead of http.
+- Uses a separate blast queue for jobs that take a long time, like uniprot blasts.
+- Made DSSP blastable, since its sequences are slightly different from pdbfinder.
 
 Changes in MRS version 6.1.0
 

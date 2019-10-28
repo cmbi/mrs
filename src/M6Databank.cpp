@@ -589,7 +589,6 @@ class M6BasicValueIx
 	virtual ~M6BasicValueIx();
 	
 	virtual void AddValue(const string& inValue, uint32 inDoc) = 0;
-	virtual void AddValue(double inValue, uint32 inDoc) = 0;
 	virtual void Finish() = 0;
   protected:
 	fs::path				mEntryBufferFile;
@@ -613,7 +612,6 @@ class M6ValueIx : public M6BasicValueIx
   public:
 	M6ValueIx(const fs::path& inDBDirectory, const string& inName, M6MultiBasicIndex* inIndex);
 	~M6ValueIx();
-	void AddValue(double inValue, uint32 inDoc)		 { THROW(("Invalid use of index")); }
 	void AddValue(const string& inValue, uint32 inDoc)	{ THROW(("Invalid use of index")); }
 	void Finish();
   protected:
@@ -724,9 +722,9 @@ M6ValueIx<T>::~M6ValueIx()
 	}
 }
 template<>
-void M6ValueIx<double>::AddValue(double inValue, uint32 inDoc)
+void M6ValueIx<double>::AddValue(const string& inValue, uint32 inDoc)
 {
-	mEntryRun->entries[mEntryRun->count].value = inValue;
+	mEntryRun->entries[mEntryRun->count].value = boost::lexical_cast<double>(inValue);
 	mEntryRun->entries[mEntryRun->count].doc = inDoc;
 	++mEntryRun->count;
 	if (mEntryRun->count == kM6EntryRunCount)
@@ -1279,7 +1277,6 @@ class M6BatchIndexProcessor
 					const M6InputDocument::M6TokenList& inTokens);
 	void		IndexValue(const string& inIndexName, M6DataType inDataType,
 					const string& inValue, bool inUnique, uint32 inDocNr);
-	void		IndexValue(const string& inIndexName, double inValue, bool inUnique, uint32 inDocNr);
 	void		IndexLink(uint32 inDocNr, const string& inDB, const string& inID);
 	void		FlushDoc(uint32 inDocNr);
 	void		Finish(uint32 inDocCount);
@@ -1463,28 +1460,6 @@ void M6BatchIndexProcessor::IndexValue(const string& inIndexName,
 		}
 		
 		index->AddWord(t);
-	}
-}
-
-void M6BatchIndexProcessor::IndexValue(const string& inIndexName,
-	double inValue, bool inUnique, uint32 inDocNr)
-{
-	if (inUnique)
-	{
-		M6BasicIndexPtr index = mDatabank.CreateIndex(inIndexName, eM6FloatIndex);
-		try
-		{
-			index->Insert(inValue, inDocNr);
-		}
-		catch (M6DuplicateKeyException& e)
-		{
-			cerr << endl << inValue << ": " << e.what() << endl;
-		}
-	}
-	else
-	{
-		M6BasicValueIx* index = GetValueIndex<eM6FloatMultiIndex,M6FloatIx>(inIndexName);
-		index->AddValue(inValue, inDocNr);
 	}
 }
 
@@ -1953,11 +1928,7 @@ void M6DatabankImpl::IndexThread()
 	
 			for (const M6InputDocument::M6IndexValue& v : doc->GetIndexValues())
 			{
-				switch (v.mDataType)
-				{
-					case eM6FloatData:	mBatch->IndexValue(v.mIndexName, v.mIndexFloatValue, v.mUnique, docNr); break;
-					default:			mBatch->IndexValue(v.mIndexName, v.mDataType, v.mIndexValue, v.mUnique, docNr); break;
-				}
+                mBatch->IndexValue(v.mIndexName, v.mDataType, v.mIndexValue, v.mUnique, docNr);
 			}
 	
 			for (const auto& lDb : doc->GetLinks())

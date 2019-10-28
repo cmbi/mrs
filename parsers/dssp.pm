@@ -11,7 +11,7 @@ sub new
 
 sub parse
 {
-	my ($self, $text) = @_;
+	my ($self, $text, $filename) = @_;
 
 	my $title;
 
@@ -25,10 +25,14 @@ sub parse
 		{
 			$title = substr($line, 10, 40);
 			my $id = substr($line, 62, 4);
-            next if ($id eq '    ');
 
-			$self->index_unique_string('id', $id);
-			$self->set_attribute('id', $id);
+            if ($id eq '    ')
+            {
+                $id = substr($filename, 0, 4);
+            }
+
+            $self->index_unique_string('id', $id);
+            $self->set_attribute('id', $id);
 		}
 		elsif ($line =~ /^COMPND.*?(?:MOLECULE: )?(?: |\d )(.+)/mo)
 		{

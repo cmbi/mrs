@@ -58,7 +58,12 @@ LDFLAGS				+= -pg
 OBJDIR				:= $(OBJDIR).profile
 endif
 
-VPATH += src
+INTEGRATION_TESTS	= 
+UNIT_TESTS			= unit_test_databank
+TESTS				= $(UNIT_TESTS) $(INTEGRATION_TESTS)
+
+
+VPATH += src unit-tests
 
 OBJECTS = \
 	$(OBJDIR)/M6BitStream.o \
@@ -100,9 +105,45 @@ mrs: $(OBJECTS)
 	@ echo "$(CXX) -o $@ -I. $^ $(LDFLAGS)"
 	@ $(CXX) -o $@ -I. $^ $(LDFLAGS)
 
+unit_test_blast: $(OBJDIR)/M6TestBlast.o $(OBJDIR)/M6Blast.o \
+		$(OBJDIR)/M6Matrix.o $(OBJDIR)/M6Error.o $(OBJDIR)/M6Progress.o \
+		$(OBJDIR)/M6Utilities.o $(OBJDIR)/M6Log.o $(OBJDIR)/M6Config.o
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+unit_test_query:  $(OBJDIR)/M6TestQuery.o $(OBJDIR)/M6Query.o \
+		$(OBJDIR)/M6Databank.o $(OBJDIR)/M6Iterator.o $(OBJDIR)/M6BitStream.o \
+		$(OBJDIR)/M6Tokenizer.o $(OBJDIR)/M6Error.o $(OBJDIR)/M6Index.o \
+		$(OBJDIR)/M6File.o $(OBJDIR)/M6Progress.o $(OBJDIR)/M6DocStore.o \
+		$(OBJDIR)/M6Document.o $(OBJDIR)/M6Lexicon.o $(OBJDIR)/M6Dictionary.o \
+		$(OBJDIR)/M6Utilities.o
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+unit_test_token: $(OBJDIR)/M6TestTokenizer.o $(OBJDIR)/M6Tokenizer.o $(OBJDIR)/M6Error.o
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+unit_test_databank: $(OBJDIR)/M6TestDatabank.o $(OBJDIR)/M6Exec.o $(OBJDIR)/M6Error.o \
+		$(OBJDIR)/M6Server.o $(OBJDIR)/M6Utilities.o $(OBJDIR)/M6Log.o $(OBJDIR)/M6Parser.o \
+		$(OBJDIR)/M6Databank.o $(OBJDIR)/M6Iterator.o $(OBJDIR)/M6BitStream.o $(OBJDIR)/M6Tokenizer.o \
+		$(OBJDIR)/M6Builder.o $(OBJDIR)/M6Document.o $(OBJDIR)/M6Config.o $(OBJDIR)/M6Query.o \
+		$(OBJDIR)/M6BlastCache.o $(OBJDIR)/M6WSSearch.o $(OBJDIR)/M6WSBlast.o $(OBJDIR)/M6Lexicon.o \
+		$(OBJDIR)/M6DocStore.o $(OBJDIR)/M6DataSource.o $(OBJDIR)/M6File.o $(OBJDIR)/M6Dictionary.o \
+		$(OBJDIR)/M6Index.o $(OBJDIR)/M6Progress.o $(OBJDIR)/M6Blast.o $(OBJDIR)/M6Matrix.o
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+unit_test_exec: $(OBJDIR)/M6TestExec.o $(OBJDIR)/M6Exec.o $(OBJDIR)/M6Error.o \
+		$(OBJDIR)/M6Server.o $(OBJDIR)/M6Utilities.o $(OBJDIR)/M6Log.o $(OBJDIR)/M6Parser.o \
+		$(OBJDIR)/M6Databank.o $(OBJDIR)/M6Iterator.o $(OBJDIR)/M6BitStream.o $(OBJDIR)/M6Tokenizer.o \
+		$(OBJDIR)/M6Builder.o $(OBJDIR)/M6Document.o $(OBJDIR)/M6Config.o $(OBJDIR)/M6Query.o \
+		$(OBJDIR)/M6BlastCache.o $(OBJDIR)/M6WSSearch.o $(OBJDIR)/M6WSBlast.o $(OBJDIR)/M6Lexicon.o \
+		$(OBJDIR)/M6DocStore.o $(OBJDIR)/M6DataSource.o $(OBJDIR)/M6File.o $(OBJDIR)/M6Dictionary.o \
+		$(OBJDIR)/M6Index.o $(OBJDIR)/M6Progress.o $(OBJDIR)/M6Blast.o $(OBJDIR)/M6Matrix.o
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+run_tests: $(TESTS)
+	@ for test in $(TESTS) ; do ./$$test || exit 1; done
+
 $(OBJDIR)/%.o: %.cpp | $(OBJDIR)
-	@ echo ">>" $<
-	@ $(CXX) -MD -c -o $@ $< $(CFLAGS) $(CXXFLAGS)
+	$(CXX) -MD -c -o $@ $< -I src $(CFLAGS) $(CXXFLAGS)
 
 $(OBJDIR)/M6Config.o: make.config
 

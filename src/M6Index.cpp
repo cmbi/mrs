@@ -67,7 +67,7 @@ class M6ValidationException : public std::exception
 
 M6DuplicateKeyException::M6DuplicateKeyException(const string& inKey)
 {
-	snprintf(mMessage, sizeof(mMessage), "Duplicate key: %s", inKey.c_str());
+	snprintf(mMessage, sizeof(mMessage), "Duplicate key: \"%s\"", inKey.c_str());
 }
 
 // --------------------------------------------------------------------

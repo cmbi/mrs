@@ -1,3 +1,10 @@
+Changes in MRS version 6.1.4
+
+- Allows floating point numbers to be indexed. Example: resolution.
+- Placed https in the urls, instead of http.
+- Uses a separate blast queue for jobs that take a long time, like uniprot blasts.
+- Made DSSP blastable, since its sequences are slightly different from pdbfinder.
+
 Changes in MRS version 6.1.2
 
 - blast jobs with a large amount of work are now placed in a separate thread.
@@ -8,6 +15,7 @@ Changes in MRS version 6.1.1
 
 Changes in MRS version 6.1.0
 
+- Replaced cmbi.ru.nl by cmbi.umcn.nl
 - Several bugs in the search algorithm have been fixed.
 - The search algorithm now allows to search by alias. Like uniprot, representing trembl + sprot.
 - The index page has been fixed to show all sections and entries.

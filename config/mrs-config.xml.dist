@@ -18,18 +18,17 @@
   <!-- Scheduler section -->
   <scheduler enabled="false" time="20:00" weekday="friday"/>
   <!-- Logger section, determines what will be logged -->
-  <logger enabled="true" priority="DEBUG"/>
+  <logger enabled="true" priority="INFO"/>
   <!-- Users section, users can be added or modified using the command "mrs password" -->
   <users>
 <!--    <user name="scott" realm="MRS Administrator" password="b92ff7d60b994c8a0d2941ad9349e841"/>-->
-      <user name="admin" realm="MRS Administrator" password="e75d9285211a1f0db651b45f0385b700"/>
   </users>
   <!-- Server section -->
   <server addr="0.0.0.0" port="__MRS_PORT__" user="__MRS_USER__" pidfile="__MRS_RUN_DIR__/mrs.pid">
     <admin realm="MRS Administrator"/>
     <base-url>__MRS_BASE_URL__</base-url>
-    <web-service service="mrsws_search" ns="https://mrs.cmbi.ru.nl/mrsws/search" location="mrsws/search"/>
-    <web-service service="mrsws_blast" ns="https://mrs.cmbi.ru.nl/mrsws/blast" location="mrsws/blast"/>
+    <web-service service="mrsws_search" ns="https://mrs.cmbi.umcn.nl/mrsws/search" location="mrsws/search"/>
+    <web-service service="mrsws_blast" ns="https://mrs.cmbi.umcn.nl/mrsws/blast" location="mrsws/blast"/>
     <blaster nthread="4"/>
     <builder nthread="4"/>
   </server>
@@ -110,7 +109,7 @@
         <alias>pdbfinder2</alias>
       </aliases>
       <name>PDBFINDER</name>
-      <source fetch="rsync://rsync.cmbi.ru.nl/pdbfinder2/PDBFIND2.TXT.gz" recursive="false">pdbfinder2/PDBFIND2.TXT.gz</source>
+      <source fetch="rsync://rsync.cmbi.umcn.nl/pdbfinder2/PDBFIND2.TXT.gz" recursive="false">pdbfinder2/PDBFIND2.TXT.gz</source>
     </databank>
     <!-- omim -->
     <databank id="omim" parser="omim" format="omim" enabled="true" update="never" fasta="false">
@@ -173,23 +172,23 @@
     </databank>
     <databank enabled="true" fasta="true" id="pdb_redo" parser="pdb" update="weekly">
       <name>PDB Redo</name>
-      <info>http://www.cmbi.ru.nl/pdb_redo</info>
+      <info>http://www.cmbi.umcn.nl/pdb_redo</info>
       <source delete="true" fetch="rsync://rsync.pdb-redo.eu/pdb-redo/" recursive="true">pdb_redo/??/????/????_final.pdb</source>
     </databank>
     <databank id="pdb" parser="pdb" enabled="true" update="daily" fasta="true">
       <name>PDB</name>
       <info>http://www.rcsb.org/pdb/</info>
-      <source delete="true" fetch="rsync.wwpdb.org::ftp_data/structures/divided/pdb/" port="33444" recursive="true">pdb/all/pdb????.ent.gz</source>
+      <source delete="true" fetch="rsync.wwpdb.org::ftp_data/structures/divided/pdb/" port="33444" recursive="true">pdb/??/pdb????.ent.gz</source>
     </databank>
     <databank id="dssp" parser="dssp" enabled="true" update="daily" fasta="true">
       <name>DSSP</name>
-      <info>http://www.cmbi.ru.nl/dssp.html</info>
+      <info>http://www.cmbi.umcn.nl/dssp.html</info>
       <source delete="true" fetch="rsync://rsync.cmbi.ru.nl/dssp/" recursive="true">dssp/????.dssp</source>
     </databank>
     <databank id="hssp" parser="hssp" enabled="true" update="daily" fasta="false">
       <name>HSSP</name>
-      <info>http://www.cmbi.ru.nl/hssp</info>
-      <source delete="true" fetch="ftp://ftp.cmbi.ru.nl/pub/molbio/data/hssp/">hssp/????.hssp.bz2</source>
+      <info>http://www.cmbi.umcn.nl/hssp</info>
+      <source delete="true" fetch="ftp://ftp.cmbi.umcn.nl/pub/molbio/data/hssp/">hssp/????.hssp.bz2</source>
     </databank>
     <databank id="gene" parser="gene" stylesheet="gene.xslt" enabled="true" update="weekly" fasta="false">
       <name>Entrez Gene</name>
@@ -298,8 +297,8 @@
     </databank>
     <databank enabled="false" fasta="false" id="hssp3" parser="hssp3" update="daily">
       <name>HSSP3, the original</name>
-      <info>http://www.cmbi.ru.nl/hssp</info>
-      <source delete="true" fetch="rsync://rsync.cmbi.ru.nl/hssp3/" recursive="false">hssp3/????.hssp.bz2</source>
+      <info>http://www.cmbi.umcn.nl/hssp</info>
+      <source delete="true" fetch="rsync://rsync.cmbi.umcn.nl/hssp3/" recursive="false">hssp3/????.hssp.bz2</source>
     </databank>
     <databank enabled="false" fasta="false" id="ptt" parser="ptt" update="weekly">
       <name>PTT</name>
@@ -307,8 +306,8 @@
     </databank>
     <databank enabled="true" fasta="false" id="pdbreport" parser="pdbreport" update="weekly">
       <name>PDB Reports</name>
-      <info>http://swift.cmbi.ru.nl/gv/pdbreport/index.html</info>
-      <source delete="true" fetch="rsync://cmbi4/data/pdbreport/" recursive="true">pdbreport/??/????/pdbout.txt</source>
+      <info>http://swift.cmbi.umcn.nl/gv/pdbreport/index.html</info>
+      <source delete="true" fetch="rsync://rsync.cmbi.umcn.nl/pdbreport/" recursive="true">pdbreport/??/????/pdbout.txt</source>
     </databank>
     <databank enabled="true" fasta="true" id="mmcif" parser="mmcif" update="daily">
       <name>mmCIF - macromolecular Crystallographic Information File</name>

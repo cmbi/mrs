@@ -1,4 +1,4 @@
-.TH mrs 1 "03-jan-2013" "version 6.1" "USER COMMANDS"
+.TH mrs 1 "28-okt-2019" "version 6.1.1" "USER COMMANDS"
 .SH NAME
 mrs \- A tool to build and manipulate a MRS 6 server and its data files
 .SH SYNOPSIS
@@ -43,4 +43,4 @@ directory containing log files for the web server.
 .B __MRS_DATA_DIR__/blast-cache
 directory containing cached blast results.
 .SH AUTHOR
-Maarten L. Hekkelman (m.hekkelman (at) cmbi.ru.nl)
+Maarten L. Hekkelman (m.hekkelman (at) cmbi.umcn.nl)

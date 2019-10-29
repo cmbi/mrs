@@ -22,7 +22,7 @@ MRS_PORT			?= 18090
 MRS_BASE_URL		?= http://chelonium.cmbi.umcn.nl:$(MRS_PORT)/
 MRS_USER			?= $(shell whoami)
 
-PERL				?= $(shell which perl)
+PERL				?= $(which perl)
 
 DEFINES				+= MRS_ETC_DIR='"$(MRS_ETC_DIR)"' \
 					   MRS_USER='"$(MRS_USER)"' \
@@ -30,13 +30,13 @@ DEFINES				+= MRS_ETC_DIR='"$(MRS_ETC_DIR)"' \
 
 BOOST_LIBS			= system thread filesystem regex math_c99 math_c99f program_options date_time iostreams timer random chrono
 BOOST_LIBS			:= $(BOOST_LIBS:%=boost_%$(BOOST_LIB_SUFFIX))
-LIBS				= m pthread rt z bz2 zeep
+LIBS				= m pthread rt z bz2 zeep nsl
 
 CXX					?= c++
 
-CXXFLAGS			+= -std=c++11
+CXXFLAGS			+= -std=c++14
 CFLAGS				+= $(INCLUDE_DIR:%=-I%) -I. -pthread
-CFLAGS				+= -Wno-deprecated -Wno-multichar
+CFLAGS				+= -Wno-deprecated -Wno-multichar 
 CFLAGS				+= $(shell $(PERL) -MExtUtils::Embed -e perl_inc)
 CFLAGS				+= $(DEFINES:%=-D%)
 
@@ -59,11 +59,11 @@ OBJDIR				:= $(OBJDIR).profile
 endif
 
 INTEGRATION_TESTS	= 
-UNIT_TESTS			= unit_test_blast unit_test_token unit_test_query unit_test_exec unit_test_databank
+UNIT_TESTS			= unit_test_databank
 TESTS				= $(UNIT_TESTS) $(INTEGRATION_TESTS)
 
 
-VPATH += src unit-tests integration-tests
+VPATH += src unit-tests
 
 OBJECTS = \
 	$(OBJDIR)/M6BitStream.o \
@@ -96,7 +96,7 @@ OBJECTS = \
 	$(OBJDIR)/M6WSBlast.o \
 	$(OBJDIR)/M6WSSearch.o \
 
-all: mrs config/mrs-config.xml mrs.1 init.d/mrs run_tests
+all: mrs config/mrs-config.xml mrs.1 init.d/mrs
 
 checkcache: $(OBJDIR)/checkcache.o
 	$(CXX) -o $@ -I. $< $(LDFLAGS)
@@ -143,15 +143,14 @@ run_tests: $(TESTS)
 	@ for test in $(TESTS) ; do ./$$test || exit 1; done
 
 $(OBJDIR)/%.o: %.cpp | $(OBJDIR)
-	@ echo ">>" $<
-	@ $(CXX) -MD -c -o $@ $< -I src $(CFLAGS) $(CXXFLAGS)
+	$(CXX) -MD -c -o $@ $< -I src $(CFLAGS) $(CXXFLAGS)
 
 $(OBJDIR)/M6Config.o: make.config
 
 unicode/M6UnicodeTables.h src/../unicode/M6UnicodeTables.h:
 	cd unicode; $(PERL) unicode-table-creator.pl > $(@F)
 
-include $(OBJECTS:%.o=%.d)
+-include $(OBJECTS:%.o=%.d)
 
 $(OBJECTS:.o=.d):
 
@@ -196,12 +195,10 @@ install: mrs config/mrs-config.xml mrs.1 init.d/mrs logrotate.d/mrs
 	@ for d in `find docroot -type d | grep -v .svn`; do \
 		install -m755 -d $(MRS_DATA_DIR)/$$d; \
 	done
-	install -m755 -d $(MRS_DATA_DIR)/docroot/dtd
 	@ echo "Copying files"
 	@ for f in `find docroot -type f | grep -v .svn`; do \
 		install -m644 $$f $(MRS_DATA_DIR)/$$f; \
 	done
-	install -m644 config/mrs-config.dtd $(MRS_DATA_DIR)/docroot/dtd/mrs-config.dtd
 	@ for f in `find parsers -type f | grep -v .svn`; do \
 		install -m644 $$f $(MRS_DATA_DIR)/$$f; \
 	done

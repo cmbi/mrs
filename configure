@@ -70,8 +70,7 @@ my @libs = (
 open(my $h, "hostname -I|");
 my $host = <$h> if $h;
 close($h);
-#$host = `hostname -f` unless defined $host;
-$host = "chelonium.cmbi.umcn.nl";
+$host = "chelonium.umcn.nl";
 $host =~ s/\s+$//;
 
 my $mrs_user = `whoami`;
@@ -291,12 +290,12 @@ END
 		or length(@boost_version) == 0 or not defined $boost_version[0])
 	{
 		die "\n\nCannot continue since you don't seem to have boost installed\n",
-			"Please install e.g. the libboost1.65-all-dev package and run configure again.\n";
+			"Please install e.g. the libboost1.48-all-dev package and run configure again.\n";
 	}
 
 	@boost_version = split(m/_/, $boost_version[0]);
 	
-	die "MRS needs boost version 1.65 or higher\n" unless $boost_version[1] >= 65;
+	die "MRS needs boost version 1.48 or higher\n" unless $boost_version[1] >= 48;
 
 	# zeep libraries
 	if ($zeep)
@@ -379,31 +378,32 @@ END
 	$cxxflags = sprintf("$cxxflags %s %s", &perl_inc(), &ldopts());
 	$cxxflags =~ s/\s+/ /g;
 	
-	$header_check =<<END;
-#include "EXTERN.h"
-#include "XSUB.h"
-#include <iostream>
-int main() { std::cout << 1 << '\t' << 0; return 0; }
-END
-
-	$lib_check =<<END;
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-int main()
-{ 
-	int argc = 0;
-	const char* env[] = { nullptr };
-	const char* argv[] = { nullptr };
-	PERL_SYS_INIT3(&argc, (char***)&argv, (char***)&env);
-	return 0;
-}
-END
-	if (not CheckLib("perl", $header_check, $lib_check))
-	{
-		die "\n\nCannot continue since libperl is not installed correctly\n",
-			"Please install the libperl-dev package and run configure again\n";
-	}
+#	$header_check =<<END;
+##include "EXTERN.h"
+##include "perl.h"
+##include "XSUB.h"
+##include <iostream>
+#int main() { std::cout << 1 << '\t' << 0; return 0; }
+#END
+#
+#	$lib_check =<<END;
+##include "EXTERN.h"
+##include "perl.h"
+##include "XSUB.h"
+#int main()
+#{ 
+#	int argc = 0;
+#	const char* env[] = { nullptr };
+#	const char* argv[] = { nullptr };
+#	PERL_SYS_INIT3(&argc, (char***)&argv, (char***)&env);
+#	return 0;
+#}
+#END
+#	if (not CheckLib("perl", $header_check, $lib_check))
+#	{
+#		die "\n\nCannot continue since libperl is not installed correctly\n",
+#			"Please install the libperl-dev package and run configure again\n";
+#	}
 }
 
 sub CheckLib

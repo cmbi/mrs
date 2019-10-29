@@ -51,7 +51,9 @@ the m6src is now searchable.
 
 # Building MRS
 
-You need gcc 4.6, log4cpp >= 5 and boost >= 1.65 to build MRS. Intel compilers are supported
+Building MRS
+
+You need gcc 8.3.0 and boost >= 1.65 to build MRS. Intel compilers are supported
 and Visual Studio 2010 is OK too.
 
 ## Docker
@@ -86,7 +88,6 @@ You need to have the following to build MRS from source code:
 
 - gcc 4.6
 - libboost >= 1.65
-- liblog4cpp-dev >= 5		( http://log4cpp.sourceforge.net/ )
 - libperl-dev			Development files for Perl
 
 Then run:

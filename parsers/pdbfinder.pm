@@ -72,11 +72,11 @@ sub parse
         }
         elsif (defined $NUMBER{$key} and defined $value)
         {
-            $self->index_number($key, $value * 1.0 * $NUMBER{$key});
+            $self->index_number($key, $value);
         }
         elsif (defined $FLOAT{$key} and defined $value)
         {
-            $self->index_float($key, $value * 1.0 * $FLOAT{$key});
+            $self->index_float($key, $value);
         }
         else
         {

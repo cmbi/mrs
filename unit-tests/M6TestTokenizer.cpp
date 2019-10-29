@@ -45,4 +45,3 @@ BOOST_AUTO_TEST_CASE(TestParse2)
     BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenNumber);
     BOOST_CHECK_EQUAL(tokenizer.GetTokenString(), "111");
 }
-

@@ -31,11 +31,11 @@ relative path, MRS will prepend it with the 'raw files' directory specified
 in the Main tab. If the path is absolute however, it will take this path
 directly. So we enter for Source files:
 
-    /home/me/mrs-6/*.{cpp,h,inl,c}
+    /home/me/mrs-6.0.0/*.{cpp,h,inl,c}
 
 Now if you tick the Recursive checkbox, MRS will include all files that have
 a name that ends with either .cpp, .h, .inl or .c found in any directory
-under /home/me/mrs-6/.
+under /home/me/mrs-6.0.0/.
 
 As parser use the generic parser. This parser simply indexes all text and
 assigns an incrementing number as ID to each document. It assumes each file
@@ -51,7 +51,9 @@ the m6src is now searchable.
 
 # Building MRS
 
-You need gcc 4.6 and boost >= 1.65 to build MRS. Intel compilers are supported
+Building MRS
+
+You need gcc 4.6 and boost >= 1.48 to build MRS. Intel compilers are supported
 and Visual Studio 2010 is OK too.
 
 ## Docker
@@ -85,7 +87,12 @@ to the host.
 You need to have the following to build MRS from source code:
 
 - gcc 4.6
+<<<<<<< HEAD:00-readme.txt
+- libboost >= 1.48
+=======
 - libboost >= 1.65
+- liblog4cpp-dev >= 5		( http://log4cpp.sourceforge.net/ )
+>>>>>>> master:README.md
 - libperl-dev			Development files for Perl
 
 Then run:

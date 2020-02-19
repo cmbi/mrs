@@ -333,7 +333,7 @@ UniProt = {
 		var ftbl, floc;
 		var copyright;
 	
-		var re = /^(([A-Z]{2})   ).+\n(\2.+\n)*/gm;
+		var re = /^(([A-Z]{2})   ).+\n(\2   .+\n)*/gm;
 		
 		var m;
 		while ((m = re.exec(text)) != null) {
@@ -521,7 +521,7 @@ UniProt = {
 				
 				var s = m[0].replace(/^FT   /gm, '');
 				
-				var rx = /^([^ ].{7}) (.{6}) (.{6})( (.+(\n {29}.+)*\n?))?/gm;
+				var rx = /^([A-Z]+) +([0-9]+)\.\.([0-9]+)((\n *\/[a-z]+=".+")*)/gm;
 				while ((m = rx.exec(s)) != null) {
 					
 					var len = 0;
@@ -538,7 +538,7 @@ UniProt = {
 						$("<td class='right'/>").append(m[2]),
 						$("<td class='right'/>").append(m[3]),
 						$("<td class='right'/>").append(len ? len : ''),
-						$("<td/>").append(m[4] ? m[4].replace(/\n *(?=\/)/gm, '<br/>') : '')
+						$("<td/>").append(m[4] ? m[4].replace(/\n *\//g, ' ').replace(/" /, '", ') : '')
 					).attr('id', featureId).addClass('feature')
 					.click(function() {
 						$('.feature').removeClass('highlighted');

@@ -55,7 +55,7 @@ sub parse
 	$self->set_attribute('title', $title);
 }
 
-my $RESIDUE_HEADER = '  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA            CHAIN AUTHCHAIN';
+my $RESIDUE_HEADER = '  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA';
 
 sub to_fasta
 {
@@ -69,7 +69,7 @@ sub to_fasta
     {
         $line =~ s/\n$//g;
 
-        if ($line eq $RESIDUE_HEADER)
+        if (substr($line, 0, length($RESIDUE_HEADER)) eq $RESIDUE_HEADER)
         {
             $reading_residues = 1;
         }

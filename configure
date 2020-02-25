@@ -70,7 +70,7 @@ my @libs = (
 open(my $h, "hostname -I|");
 my $host = <$h> if $h;
 close($h);
-$host = "chelonium.umcn.nl";
+$host = "chelonium.cmbi.umcn.nl";
 $host =~ s/\s+$//;
 
 my $mrs_user = `whoami`;

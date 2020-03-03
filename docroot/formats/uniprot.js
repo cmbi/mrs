@@ -521,12 +521,24 @@ UniProt = {
 				
 				var s = m[0].replace(/^FT   /gm, '');
 				
-				var rx = /^([A-Z]+) +([0-9]+)\.\.([0-9]+)((\n *\/[a-z]+=".+")*)/gm;
+				var rx = /^([A-Z]+) +([0-9\.]+)((\s*\/[a-z]+="[\s\S]+?")*)/gm;
 				while ((m = rx.exec(s)) != null) {
 					
-					var len = 0;
-					try { len = m[3] - m[2] + 1; } catch (e) {}
-					var loc = { from: m[2], to: m[3], length: len };
+					var rn = /([0-9]+)\.\.([0-9]+)/;
+					var len = 0, begin, end, n;
+					if ((n = rn.exec(m[2])) != null)
+					{
+						begin = n[1];
+						end = n[2];
+					}
+					else
+					{
+						begin = m[2];
+						end = begin;
+					}
+
+					try { len = end - begin + 1; } catch (e) {}
+					var loc = { from: begin, to: end, length: len };
 
 					floc.push(loc);
 					UniProt.features.push(new Array());
@@ -535,10 +547,10 @@ UniProt = {
 					
 					$("<tr/>").append(
 						$("<td/>").append(m[1].toLowerCase()),
-						$("<td class='right'/>").append(m[2]),
-						$("<td class='right'/>").append(m[3]),
+						$("<td class='right'/>").append(begin),
+						$("<td class='right'/>").append(end),
 						$("<td class='right'/>").append(len ? len : ''),
-						$("<td/>").append(m[4] ? m[4].replace(/\n *\//g, ' ').replace(/" /, '", ') : '')
+						$("<td/>").append(m[3] ? m[3].replace(/\n *\//g, ' ').replace(/" /, '", ') : '')
 					).attr('id', featureId).addClass('feature')
 					.click(function() {
 						$('.feature').removeClass('highlighted');

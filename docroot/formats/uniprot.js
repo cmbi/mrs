@@ -521,10 +521,10 @@ UniProt = {
 				
 				var s = m[0].replace(/^FT   /gm, '');
 				
-				var rx = /^([A-Z]+) +([0-9\.]+)((\s*\/[a-z]+="[\s\S]+?")*)/gm;
+				var rx = /^([A-Z]+) +([0-9\. ]+)((\s.+\n)*)/gm;
 				while ((m = rx.exec(s)) != null) {
 					
-					var rn = /([0-9]+)\.\.([0-9]+)/;
+					var rn = /([0-9]+)[\. ]+([0-9]+)/;
 					var len = 0, begin, end, n;
 					if ((n = rn.exec(m[2])) != null)
 					{
@@ -544,13 +544,14 @@ UniProt = {
 					UniProt.features.push(new Array());
 					
 					var featureId = "feature-" + featureNr++;
-					
 					$("<tr/>").append(
 						$("<td/>").append(m[1].toLowerCase()),
 						$("<td class='right'/>").append(begin),
 						$("<td class='right'/>").append(end),
 						$("<td class='right'/>").append(len ? len : ''),
-						$("<td/>").append(m[3] ? m[3].replace(/\n *\//g, ' ').replace(/" /, '", ') : '')
+						$("<td/>").append(m[3] ? m[3].replace(/\n/g, ', ').replace(/^ *,/, '').replace(/, *$/, '')
+													 .replace(/"/g, '')
+													 .replace(/\//g, '') : '')
 					).attr('id', featureId).addClass('feature')
 					.click(function() {
 						$('.feature').removeClass('highlighted');

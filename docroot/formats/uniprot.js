@@ -162,7 +162,7 @@ UniProt = {
 				var m = this.text.match(/^\s*([^ =:]+)(:|=)\s*/);
 				if (m != null && m.length > 2)
 				{
-					     if (m[1] == 'RecName')		{ result = this.RECNAME; }
+						 if (m[1] == 'RecName')		{ result = this.RECNAME; }
 					else if (m[1] == 'AltName')		{ result = this.ALTNAME; }
 					else if (m[1] == 'SubName')		{ result = this.SUBNAME; }
 					else if (m[1] == 'Full')		{ result = this.FULL; }
@@ -429,13 +429,13 @@ UniProt = {
 			else if (m[2] == 'CC') {
 				var s = m[0].replace(/^CC   /gm, '');
 				
-				var rx = /^\-\!\- ([A-Z ]+):(.*\n(    .+\n)*)/gm;
+				var rx = /^\-\!\- ([A-Z ]+):(.*\n(	.+\n)*)/gm;
 				var mx;
 				while ((mx = rx.exec(s)) != null) {
 					if (mx[1] == 'ALTERNATIVE PRODUCTS') {
 						var event, comment, isoforms = new Array();
 					
-						var rx2 = /^    (\w+)=([^;]+);\s*(.*\n(      .+\n)*)/gm;
+						var rx2 = /^	(\w+)=([^;]+);\s*(.*\n(	  .+\n)*)/gm;
 						var mx2;
 						while ((mx2 = rx2.exec(mx[2])) != null) {
 							if (mx2[1] == 'Event') {
@@ -450,7 +450,7 @@ UniProt = {
 								var isoform = { name: mx2[2], note: '' };
 								
 								while ((mx3 = rx3.exec(mx2[3])) != null) {
-									     if (mx3[1] == 'Synonyms') { isoform.synonym = mx3[2]; }
+										 if (mx3[1] == 'Synonyms') { isoform.synonym = mx3[2]; }
 									else if (mx3[1] == 'IsoId') { isoform.isoid = mx3[2]; }
 									else if (mx3[1] == 'Sequence') { isoform.seq = mx3[2]; }
 									else if (mx3[1] == 'Note') { isoform.note += ' ' + mx3[2]; }
@@ -521,7 +521,7 @@ UniProt = {
 				
 				var s = m[0].replace(/^FT   /gm, '');
 				
-				var rx = /^([_A-Z]+) +([0-9\. ]*[0-9])((\s.+\n)*)/gm;
+				var rx = /^([_A-Z]+) +([0-9\. ]*[0-9])((\n? .+)*)/gm;
 				while ((m = rx.exec(s)) != null) {
 					
 					var rn = /([0-9]+)[\. ]+([0-9]+)/;
@@ -549,9 +549,10 @@ UniProt = {
 						$("<td class='right'/>").append(begin),
 						$("<td class='right'/>").append(end),
 						$("<td class='right'/>").append(len ? len : ''),
-						$("<td/>").append(m[3] ? m[3].replace(/\n/g, ', ').replace(/^ *,/, '').replace(/, *$/, '')
-													 .replace(/"/g, '')
-													 .replace(/\//g, '') : '')
+						$("<td/>").append((m[3] != null) ? m[3].replace(/<(.*) .*>(.*)<\/\1>/, '$2')
+																.replace(/\n/g, ', ').replace(/^ *,/, '').replace(/, *$/, '')
+																.replace(/"/g, '')
+																.replace(/\//g, '') : '')
 					).attr('id', featureId).addClass('feature')
 					.click(function() {
 						$('.feature').removeClass('highlighted');
@@ -592,7 +593,7 @@ UniProt = {
 					  "CRC64 checksum <strong>" + crc + "</strong>")
 				);
 				
-				rx = /^SQ   .*\n((     .+\n)+)/m;
+				rx = /^SQ   .*\n((	 .+\n)+)/m;
 				if ((m = rx.exec(text)) != null) {
 					seqr.push($("<td colspan='2'/>").addClass('sequence')
 						.append(UniProt.createSequence(m[1], floc)));

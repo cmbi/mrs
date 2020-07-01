@@ -28,6 +28,7 @@
 #include "M6Exec.h"
 #include "M6Error.h"
 #include "M6Server.h"
+#include "M6Log.h"
 
 using namespace std;
 namespace fs = boost::filesystem;
@@ -418,6 +419,13 @@ int ForkExec(vector<const char*>& args, double maxRunTime, istream& stdin, ostre
 	if (not fs::exists(args.front()))
 		THROW(("The executable '%s' does not seem to exist", args.front()));
 
+    string cmd;
+    for (auto arg = args.begin(); arg != args.end() and *arg != nullptr; ++arg)
+        cmd = cmd + " " + *arg;
+
+    LOG(DEBUG, "called ForkExec with \"" + cmd + "\"");
+
+
 	// ready to roll
 	double startTime = system_time();
 
@@ -434,20 +442,30 @@ int ForkExec(vector<const char*>& args, double maxRunTime, istream& stdin, ostre
 		ioService->notify_fork(boost::asio::io_service::fork_prepare);
 	}
 	
+    LOG(DEBUG, "ExecFork forks");
+
 	int pid = fork();
 	
 	if (pid == 0)	// the child
 	{
+        LOG(DEBUG, "ExecFork child");
+
 		if (ioService != nullptr)
 		{
-			ioService->notify_fork(boost::asio::io_service::fork_child);
+            LOG(DEBUG, "ExecFork has ioService");
 
-			M6Server::Instance()->stop();
+			ioService->notify_fork(boost::asio::io_service::fork_child);
 		}
+
+        LOG(DEBUG, "ExecFork setpgid");
 		
 		setpgid(0, 0);		// detach from the process group, create new
 
+        LOG(DEBUG, "ExecFork signal");
+
 		signal(SIGCHLD, SIG_IGN);	// block child died signals
+
+        LOG(DEBUG, "ExecFork files");
 
 		dup2(ifd[0], STDIN_FILENO);
 		close(ifd[0]);
@@ -460,6 +478,8 @@ int ForkExec(vector<const char*>& args, double maxRunTime, istream& stdin, ostre
 		dup2(efd[1], STDERR_FILENO);
 		close(efd[0]);
 		close(efd[1]);
+
+        LOG(DEBUG, "execve \"" + cmd + "\"");
 
 		const char* env[] = { nullptr };
 		(void)execve(args.front(), const_cast<char* const*>(&args[0]), const_cast<char* const*>(env));

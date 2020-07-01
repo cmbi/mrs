@@ -3354,31 +3354,33 @@ void M6Server::handle_align(const zh::request& request, const el::scope& scope, 
 
 		LOG(INFO, "handle align request with seqs=%s", seqstr.c_str());
 	
-	ba::replace_all(seqstr, "\r\n", "\n");
-	ba::replace_all(seqstr, "\r", "\n");
-	
-	map<string,shared_ptr<M6Parser>> parsers;
-	
-	if (not seqstr.empty())
-	{
-		vector<string> seqs;
-		ba::split(seqs, seqstr, ba::is_any_of(";"));
-		string fasta;
-		
-		for (string& ts : seqs)
-		{
-			string::size_type s = ts.find('/');
-			if (s == string::npos)
-				THROW(("Invalid parameters passed for align"));
-			fasta += GetEntry(ts.substr(0, s), ts.substr(s + 1), "fasta");
-		}
+        ba::replace_all(seqstr, "\r\n", "\n");
+        ba::replace_all(seqstr, "\r", "\n");
+        
+        map<string,shared_ptr<M6Parser>> parsers;
+        
+        sub.put("input", "");
 
-		sub.put("input", el::object(fasta));
-	}
-	
-	create_reply_from_template("align.html", sub, reply);
+        if (not seqstr.empty())
+        {
+            vector<string> seqs;
+            ba::split(seqs, seqstr, ba::is_any_of(";"));
+            string fasta;
+            
+            for (string& ts : seqs)
+            {
+                string::size_type s = ts.find('/');
+                if (s == string::npos)
+                    THROW(("Invalid parameters passed for align"));
+                fasta += GetEntry(ts.substr(0, s), ts.substr(s + 1), "fasta");
+            }
 
-		LOG(INFO, "done generating align response for seqs=%s", seqstr.c_str());
+            sub.put("input", el::object(fasta));
+        }
+
+        create_reply_from_template("align.html", sub, reply);
+
+        LOG(INFO, "done generating align response for seqs=%s", seqstr.c_str());
 	}
 	catch(...)
 	{

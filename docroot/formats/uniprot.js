@@ -593,7 +593,7 @@ UniProt = {
 					  "CRC64 checksum <strong>" + crc + "</strong>")
 				);
 				
-				rx = /^SQ   .*\n((	 .+\n)+)/m;
+				rx = /^SQ   .*\n((     .+\n)+)/m;
 				if ((m = rx.exec(text)) != null) {
 					seqr.push($("<td colspan='2'/>").addClass('sequence')
 						.append(UniProt.createSequence(m[1], floc)));

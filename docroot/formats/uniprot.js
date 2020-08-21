@@ -521,7 +521,7 @@ UniProt = {
 				
 				var s = m[0].replace(/^FT   /gm, '');
 				
-				var rx = /^([_A-Z]+) +([0-9\. ]*[0-9])()/gm;
+                var rx = /^([_A-Z]+) +([0-9\. ]*[0-9]\n)((  .+\n)*)/gm;
 				while ((m = rx.exec(s)) != null) {
 					
 					var rn = /([0-9]+)[\. ]+([0-9]+)/;

@@ -45,3 +45,13 @@ BOOST_AUTO_TEST_CASE(TestParse2)
     BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenNumber);
     BOOST_CHECK_EQUAL(tokenizer.GetTokenString(), "111");
 }
+
+BOOST_AUTO_TEST_CASE(TestParse3)
+{
+    std::string queryString = "sigma-1";
+
+    M6Tokenizer tokenizer(queryString);
+
+    BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenWord);
+    BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenEOF);
+}

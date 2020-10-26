@@ -644,7 +644,7 @@ M6Token M6Tokenizer::GetNextWord()
 			case 30:
 				if (fast::iscombm(c))
 					hasCombiningMarks = true;
-				else if (fast::is_han(c) or not fast::isalnum(c))
+				else if (fast::is_han(c) or not (fast::isalnum(c) or c == '.' or c=='-'))
 				{
 					Retract(*--t);
 					result = eM6TokenWord;
@@ -858,7 +858,7 @@ M6Token M6Tokenizer::GetNextQueryToken()
 					hasCombiningMarks = true;
 				else if (c == '?' or c == '*')
 					isPattern = true;
-				else if (fast::is_han(c) or not (fast::isalnum(c) or c == '.'))
+				else if (fast::is_han(c) or not (fast::isalnum(c) or c == '.' or c=='-'))
 				{
 					Retract(*--t);
 					result = isPattern ? eM6TokenPattern : eM6TokenWord;

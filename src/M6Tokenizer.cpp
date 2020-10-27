@@ -786,7 +786,7 @@ M6Token M6Tokenizer::GetNextQueryToken()
 				}
 				break;
 			
-			case 202:
+			case 202:   // '+' seen
 				if (c >= '0' and c <= '9')
 					state = 203;
 				else
@@ -802,13 +802,17 @@ M6Token M6Tokenizer::GetNextQueryToken()
 				else if (c == 'e' or c == 'E')
 					state = 205;
 				else
-					Restart(20);
+					state = 20;
 				break;
 			
 			case 204:
 				if (c == 'e' or c == 'E')
 					state = 205;
-				else if (c < '0' or c > '9')
+				else if (c > '0' and c < '9')
+                {
+                    // float digit, go to next
+                }
+                else
 				{
 					Retract(*--t);
 					result = eM6TokenFloat;	

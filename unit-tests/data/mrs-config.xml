@@ -28,8 +28,8 @@
   <server addr="0.0.0.0" port="__MRS_PORT__" user="__MRS_USER__" pidfile="__MRS_RUN_DIR__/mrs.pid">
     <admin realm="MRS Administrator"/>
     <base-url>__MRS_BASE_URL__</base-url>
-    <web-service service="mrsws_search" ns="https://mrs.cmbi.ru.nl/mrsws/search" location="mrsws/search"/>
-    <web-service service="mrsws_blast" ns="https://mrs.cmbi.ru.nl/mrsws/blast" location="mrsws/blast"/>
+    <web-service service="mrsws_search" ns="https://mrs.cmbi.umcn.nl/mrsws/search" location="mrsws/search"/>
+    <web-service service="mrsws_blast" ns="https://mrs.cmbi.umcn.nl/mrsws/blast" location="mrsws/blast"/>
     <blaster nthread="4"/>
     <builder nthread="4"/>
   </server>

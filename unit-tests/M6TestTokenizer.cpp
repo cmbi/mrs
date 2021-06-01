@@ -85,3 +85,23 @@ BOOST_AUTO_TEST_CASE(TestParseFloat)
     BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenFloat);
     BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenEOF);
 }
+
+BOOST_AUTO_TEST_CASE(TestParseAc)
+{
+    std::string queryString = "2e9l";
+
+    M6Tokenizer tokenizer(queryString);
+
+    BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenWord);
+    BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenEOF);
+}
+
+BOOST_AUTO_TEST_CASE(TestParseExp9)
+{
+    std::string queryString = "2e9";
+
+    M6Tokenizer tokenizer(queryString);
+
+    BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenFloat);
+    BOOST_CHECK_EQUAL(tokenizer.GetNextQueryToken(), eM6TokenEOF);
+}

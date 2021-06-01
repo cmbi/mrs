@@ -812,10 +812,15 @@ M6Token M6Tokenizer::GetNextQueryToken()
                 {
                     // float digit, go to next
                 }
+                else if (fast::isspace(c) or c == 0)
+                {
+                    Retract(*--t);
+                    result = eM6TokenFloat;
+                }
                 else
-				{
+                {
 					Retract(*--t);
-					result = eM6TokenFloat;	
+                    state = 10;  // consider it a word
 				}
 				break;
 		
@@ -833,11 +838,16 @@ M6Token M6Tokenizer::GetNextQueryToken()
 				break;
 			
 			case 207:
-				if (c < '0' or c > '9')
+                if (fast::isspace(c) or c == 0)
 				{
 					Retract(*--t);
 					result = eM6TokenFloat;
 				}
+				else if (c < '0' or c > '9')
+                {
+					Retract(*--t);
+                    state = 10;  // consider it a word
+                }
 				break;
 		
 			// matched a digit, allow only cardinals or an identifier starting with a digit

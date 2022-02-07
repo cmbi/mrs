@@ -52,6 +52,13 @@ sub parse
 		$self->add_link('hssp', $id);
 		$self->add_link('pdbfinder2', $id);
 	}
+	elsif ( $filename =~ m/AF-(.+)-model_v1.pdb/)
+	{
+		my $id = $1;
+
+		$self->set_attribute('id', $id);
+		$self->index_unique_string('id', $id);
+	}
 
 	my ($header, $title, $compound, $model_count, %ligands);
 
@@ -69,7 +76,7 @@ sub parse
 		
 			# xxxx is used in the pdb_redo files	
 			my $id = substr($line, 62, 4);
-			if ( (lc $id) ne 'xxxx' )
+			if ( (lc $id) ne 'xxxx' and $id ne '    ' )
 			{
 				$self->set_attribute('id', $id);
 				$self->index_unique_string('id', $id);

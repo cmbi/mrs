@@ -109,12 +109,12 @@ sub parse
 			}
 			$self->index_text('compnd', $text);
 		}
-        elsif ($fld eq 'KEYWDS')
-        {
-            foreach my $wrd (split(m/ /, $text)) {
-                $self->index_string('keyword', $wrd);
-            }
-        }
+		elsif ($fld eq 'KEYWDS')
+		{
+		    foreach my $wrd (split(m/ /, $text)) {
+			$self->index_string('keyword', $wrd);
+		    }
+		}
 		elsif ($fld eq 'AUTHOR')
 		{
 			# split out the author name, otherwise users won't be able to find them
@@ -194,17 +194,19 @@ sub to_fasta
 
 	my %seq;
 
-	while ($text =~ m/^SEQRES.+/mg)
+	while ($text =~ m/^ATOM\s.+\n/gm)
 	{
-		my $chainId = substr($&, 11, 1);
-		my $r = substr($&, 19);
+		my $line = $&;
+
+		my $chainId = substr($line, 21, 1);
+		my $resname = substr($line, 17, 3);
+		my $atomname = substr($line, 12, 4);
 
 		$seq{$chainId} = '' unless defined $seq{$chainId};
-		
-		foreach my $res (split(m/ /, $r))
+
+		if ($atomname eq ' CA ')
 		{
-			next unless length($res) == 3;
-			my $aa = $aa_map{$res};
+			my $aa = $aa_map{$resname};
 			$aa = 'X' unless defined $aa;
 			$seq{$chainId} .= $aa;
 		}

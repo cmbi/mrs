@@ -287,7 +287,7 @@ END
 	
 	my @boost_version;
 	if (not (@boost_version = CheckLib("boost", $header_check, undef))
-		or length(@boost_version) == 0 or not defined $boost_version[0])
+		or scalar(@boost_version) == 0 or not defined $boost_version[0])
 	{
 		die "\n\nCannot continue since you don't seem to have boost installed\n",
 			"Please install e.g. the libboost1.48-all-dev package and run configure again.\n";

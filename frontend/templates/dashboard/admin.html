@@ -1,0 +1,384 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:mrs="https://mrs.cmbi.umcn.nl/mrs-web/ml"
+	xmlns:z2="http://www.hekkelman.com/libzeep/m2"
+	xml:lang="en" lang="en">
+<head>
+    <title>MRS Administration</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Maarten L. Hekkelman" />
+    <meta name="generator" content="Japi" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+	<link rel="stylesheet" type="text/css" href="css/mrs-style.css" />
+
+	<script src="scripts/jquery/jquery.js" type="text/javascript">
+	</script>
+	
+	<script src="scripts/mrs.js" type="text/javascript">
+	</script>
+
+	<script src="scripts/admin.js" type="text/javascript">
+	</script>
+
+</head>
+<body>
+	<div z2:replace="header :: #header" />
+	<div id="main">
+		<div class="nav">
+			<ul>
+				<li><a href="#" data-id="global">Main</a></li>
+				<li><a href="#" data-id="server">Server</a></li>
+				<li><a href="#" data-id="parsers">Parsers</a></li>
+				<li><a href="#" data-id="formats">Formats</a></li>
+				<li><a href="#" data-id="databanks">Databanks</a></li>
+				<li><a href="#" data-id="scheduler">Scheduler</a></li>
+				<li><a href="#" data-id="blast">Blast Queue</a></li>
+			</ul>
+		</div>
+
+		<div class="admin">
+			<div id="global" class="section">
+				<form class="admin_form" method="POST">
+					<input type='hidden' name='submit' value='global'/>
+					<fieldset>
+						<h3>Directories</h3>
+						<div><label>MRS files</label><input type="text" value="${global.dirs['mrs']}" name="mrs"/></div>
+						<div><label>Raw files</label><input type="text" value="${global.dirs['raw']}" name="raw"/></div>
+						<div><label>Parsers</label><input type="text" value="${global.dirs['parser']}" name="parser"/></div>
+						<div><label>Docroot</label><input type="text" value="${global.dirs['docroot']}" name="docroot"/></div>
+						<div><label>Blast cache</label><input type="text" value="${global.dirs['blast']}" name="blast"/></div>
+						<h3>Tools</h3>
+						<div><label>Clustal Omega</label><input type="text" value="${global.tools['clustalo']}" name="clustalo"/></div>
+						<div><label>rsync</label><input type="text" value="${global.tools['rsync']}" name="rsync"/></div>
+						<hr/>
+						<input type='submit' value='Submit'/><input type='reset' value='Reset'/>
+					</fieldset>
+				</form>
+
+				<form class="admin_form" method="POST">
+					<input type="hidden" name="submit" value="restart"/>
+					
+					<fieldset>
+						<h3>Restart</h3>
+						<p>After changing the configuration options you have to restart the server
+						to make sure these changes are taken into effect.</p>
+						<input type='submit' value='Restart'/>
+					</fieldset>
+				</form>
+			</div>
+			
+			<div id="server" class="section">
+				<form id="server" class="admin_form" method="POST">
+					<input type='hidden' name='submit' value='server'/>
+					<input type='hidden' name='nr' value="${db.nr}"/>
+					<fieldset>
+						<h3>Server configuration</h3>
+						<div><label>Address</label><input type="text" value="${server.addr}" name="addr"/></div>
+						<div><label>Port</label><input type="text" value="${server.port}" name="port"/></div>
+						<p>The base URL is the URL by which users can access this server from outside your domain.</p>
+						<div><label>Base URL</label><input type="text" value="${server.baseurl}" name="baseurl"/></div>
+						<p>By default the client address is recorded in the log file, but if the server is behind a reverse proxy,
+						the last X-Forwarded-For entry might be more informative.</p>
+						<div><label>Log Forwarded</label><mrs:checkbox name="log_forwarded" checked="${server.log_forwarded}"/></div>
+						
+						<h3>Web Service Locations</h3>
+						<p>Leave empty to disable web service</p>
+						<div><label>Search</label><input type="text" value="${server.ws['mrsws_search']}" name="mrsws_search"/></div>
+						<div><label>Blast</label><input type="text" value="${server.ws['mrsws_blast']}" name="mrsws_blast"/></div>
+<!--						<div><label>Align</label><input type="text" value="${server.ws['mrsws_align']}" name="mrsws_align"/></div>-->
+						<hr/>
+						<input type='submit' value='Submit'/><input type='reset' value='Reset'/>
+					</fieldset>
+				</form>
+
+			</div>
+			
+			<div id="parsers" class="section">
+				<div class="admin-left">
+					<div class="tablebox">
+						<table cellspacing="0" cellpadding="0" class="select_form">
+							<caption>Parsers</caption>
+							<mrs:iterate collection="parsers" var="parser">
+								<tr data-target="parser-${parser.id}"><td>${parser.id}</td></tr>
+							</mrs:iterate>
+						</table>
+					</div>
+					<form id="add-del-parsers" class="add-del" method='post'>
+						<input type='hidden' name='submit' value='parsers'/>
+						<input type='hidden' name='selected' value='' />
+						<input type='submit' value='add' name='btn' disabled='disabled'/>
+						<input type='submit' value='delete' name='btn' disabled='disabled'/>
+					</form>
+				</div>
+				
+				<div class="admin-right">
+					<mrs:iterate collection="parsers" var="parser">
+					<form data-id="${parser.id}" class="admin_form" method="post" style="display:none">
+						<input type='hidden' name='submit' value='parsers'/>
+						<fieldset>
+							<h3>Parser configuration</h3>
+							<mrs:if test="${empty parser.script}">
+							<p>XML parsers are not configurable in the admin pages yet</p>	
+							</mrs:if>
+							<mrs:if test="${parser.script}">
+							<p>Perl based parsers should be edited directly, you can find the
+							file for the <code>${parser.id}</code> parser at <code style="white-space:nowrap">${global.dirs['parser'] + '/' + parser.script + '.pm'}</code></p>
+							</mrs:if>
+						</fieldset>
+					</form>
+					</mrs:iterate>
+				</div>
+				
+				<div class="admin-clear" />
+			</div>
+				
+			<div id="formats" class="section">
+				<div class="admin-left">
+					<div class="tablebox">
+						<table cellspacing="0" cellpadding="0" class="select_form">
+							<caption>Formats</caption>
+							<mrs:iterate collection="formats" var="format">
+								<tr data-target="format-${format.id}"><td>${format.id}</td></tr>
+							</mrs:iterate>
+						</table>
+					</div>
+					<form id="add-del-formats" class="add-del" method='post'>
+						<input type='hidden' name='submit' value='formats'/>
+						<input type='hidden' name='selected' value='' />
+						<input type='submit' value='add' name='btn'/>
+						<input type='submit' value='delete' name='btn'/>
+					</form>
+				</div>
+				
+				<div class="admin-right">
+				<mrs:iterate collection="formats" var="format">
+					<form data-id="format-${format.id}" class="admin_form" method="POST" style="display:none">
+						<fieldset>
+							<h3>Format specification</h3>
+							<input type='hidden' name='submit' value='formats'/>
+							<input type='hidden' name='original-id' value='${format.id}'/>
+
+							<div><label>ID</label><input type="text" name="format-id" value="${format.id}"/></div>
+
+							<h3>Document layout</h3>
+
+							<p>Formatting a document can be done using JavaScript plugins. To specify a script for the ${format.id}
+							format choose one from the list here which is based on the files found in
+							<code>${global.dirs['docroot']}/formats</code>.</p>
+
+								<div><label>JavaScript</label><select name="script">
+									<option value="">No script</option>
+									<mrs:options collection="scripts" value="id" label="id" selected="${format.script}"/>
+								</select></div>
+							<h3>Links</h3>
+							<p>Create 'live' links in documents based on a regular expression. You can reference captures in the
+							regular expression using the variable names $1 for the first capture, $2 for the second, etc.</p>
+							<table id="format-link-table-${format.id}" cellspacing="0" cellpadding="0" style="${empty format.links ? 'display:none' : ''}">
+								<tr>
+									<th>Regular Expression</th>
+									<th>Target Databank</th>
+									<th>Target ID</th>
+									<th>Index</th>
+									<th>Anchor</th>
+									<th/>
+								</tr>
+							<mrs:iterate collection="${format.links}" var="link">
+								<tr>
+									<td><input type="text" value="${link.rx}" name="rx"/></td>
+									<td><select name="db"><mrs:options collection="aliases" value="id" label="name" selected="${link.db}" /></select></td>
+									<td><input type="text" value="${link.id}" name="id"/></td>
+									<td><input type="text" value="${link.ix}" name="ix"/></td>
+									<td><input type="text" value="${link.an}" name="an"/></td>
+									<td><div class="delete">Delete</div></td>
+								</tr>
+							</mrs:iterate>
+								<tr style="display:none">
+									<td><input type="text" name="rx"/></td>
+									<td><select name="db"><mrs:options collection="aliases" value="id" label="name" /></select></td>
+									<td><input type="text" name="id"/></td>
+									<td><input type="text" name="ix"/></td>
+									<td><input type="text" name="an"/></td>
+									<td><div class="delete">Delete</div></td>
+								</tr>
+							</table>
+							<button class="add-link" data-format="${format.id}">Add link</button>
+					
+							<hr/>
+							<input type='submit' value='Submit'/><input type='reset' value='Reset'/>
+						</fieldset>
+					</form>
+					
+				</mrs:iterate>
+				</div>
+				
+				<div class="admin-clear" />
+			</div>
+	
+			<div id="databanks" class="section">
+				<div class="admin-left">
+					<div class="tablebox">
+						<table cellspacing="0" cellpadding="0" class="select_form">
+							<caption>Databanks</caption>
+							<mrs:iterate collection="config-databanks" var="db">
+								<tr data-target="db-${db.id}"><td><mrs:if test="${db.enabled}">${db.id}</mrs:if><mrs:if test="${not db.enabled}"><em>${db.id}</em></mrs:if></td></tr>
+							</mrs:iterate>
+						</table>
+					</div>
+					<form id="add-del-databanks" class="add-del" method='post'>
+						<input type='hidden' name='submit' value='databanks'/>
+						<input type='hidden' name='selected' value='' />
+						<input type='submit' value='add' name='btn'/>
+						<input type='submit' value='delete' name='btn'/>
+					</form>
+				</div>
+				
+				<div class="admin-right">
+				<mrs:iterate collection="config-databanks" var="db">
+					<form data-id="db-${db.id}" class="admin_form" method="POST" style="display:none">
+						<fieldset>
+							<h3>Databank information</h3>
+							<input type='hidden' name='submit' value='databanks'/>
+							<input type='hidden' name='original-id' value='${db.id}'/>
+							<div><label>ID</label><input type="text" name="id" value="${db.id}"/></div>
+							<div><label>Enabled</label><mrs:checkbox name="enabled" checked="${db.enabled}"/></div>
+
+							<div><label>Name</label><input type="text" value="${db.name}" name="name"/></div>
+							<div><label>Info URL</label><input type="text" value="${db.info}" name="info"/></div>
+							
+							<p>Aliases are used in the Blast form and in creating links between databanks based on
+							the values found in e.g. db_xref records. The <em>name</em> is used in the blast databank popup menu.</p>
+							
+							<div><label>Aliases</label><div class="aliases">
+								<table data-id="${db.id}-aliases" cellspacing="0" cellpadding="0"
+												style="${empty db.aliases ? 'display:none;' : ''}">
+									<tr>
+										<th>ID</th>
+										<th>Name</th>
+										<th/>
+									</tr>
+								<mrs:iterate collection="${db.aliases}" var="alias">
+									<tr>
+										<td><input type="text" value="${alias.id}" name="alias-id"/></td>
+										<td><input type="text" value="${alias.name}" name="alias-name"/></td>
+										<td><div class="delete">Delete</div></td>
+									</tr>
+								</mrs:iterate>
+									<tr style="display:none">
+										<td><input type="text" value="" name="alias-id"/></td>
+										<td><input type="text" value="" name="alias-name"/></td>
+										<td><div class="delete">Delete</div></td>
+									</tr>
+								</table>
+								<span class="clickable add-alias" data-db="${db.id}">Add alias</span>
+							</div>
+							</div>
+
+							<h3>Data retrieval</h3>
+							<div><label>Update</label><select name="update">
+								<mrs:option value="never" selected="${db.update}">never</mrs:option>
+								<mrs:option value="daily" selected="${db.update}">daily</mrs:option>
+								<mrs:option value="weekly" selected="${db.update}">weekly</mrs:option>
+								<mrs:option value="monthly" selected="${db.update}">monthly</mrs:option>
+							</select></div>
+							<p>The source files are expected to be located relative to the raw directory, unless you enter an absolute path.</p>
+							<div><label>Source files</label><input type="text" value="${db.source}" name="source"/></div>
+							<p>Upstream URL can either be ftp:// or rsync://</p>
+							<div><label>Upstream URL</label><input type="text" value="${db.fetch.src}" name="fetch"/></div>
+							<div><label>Delete stale files</label><mrs:checkbox name="delete" checked="${db.fetch.delete}"/></div>
+							<div><label>Recusive (rsync)</label><mrs:checkbox name="recursive" checked="${db.fetch.recursive}"/></div>
+							<div><label>Port number (rsync)</label><input type="text" value="${db.fetch.port}" name="port"/></div>
+							
+							<h3>Data processing</h3>
+<!--							<p>Parsing data is done using Perl based parser scripts. These are located in the -->
+<!--							directory <code>${global.dirs['parser']}</code>.</p>-->
+							<div><label>Parser</label><select name="parser">
+									<mrs:options collection="parsers" value="id" label="id" selected="${db.parser}"/>
+								</select>
+							</div>
+							<p>FastA file is needed to be able to use the blast search function.</p>
+							<div><label>Create FastA</label><mrs:checkbox name="fasta" checked="${db.fasta}"/></div>
+							<p>Filters are optional programs through which the raw data is fed, for the Gene databank
+							you could e.g. enter <code>/usr/bin/gene2xml -bT</code> to convert ASN.1 into XML on the fly.</p>
+							<div><label>Filter</label><input type="text" value="${db.filter}" name="filter"/></div>
+							
+							<p>Formatting can be done with one of the defined formatters, or for XML databanks, with
+							an XML Stylesheet.</p>
+							
+							<div><label>Formatter</label><select name="format" data-db="${db.id}">
+									<option value="none">No format</option>
+									<mrs:option value="xml" selected="${db.format}">XML Stylesheet</mrs:option>
+									<mrs:options collection="formats" value="id" label="id" selected="${db.format}"/>
+								</select>
+								<input type="text" value="${db.stylesheet}" name="stylesheet" style="display:none; width: 250px"/>
+							</div>
+
+							<hr/>
+							<input type='submit' value='Submit'/><input type='reset' value='Reset'/>
+						</fieldset>
+					</form>
+					
+				</mrs:iterate>
+				</div>
+				
+				<div class="admin-clear" />
+			</div>
+	
+			<div id="scheduler" class="section">
+				<form class="admin_form" method="POST">
+					<input type='hidden' name='submit' value='scheduler'/>
+					<fieldset>
+						<h3>Scheduler</h3>
+						<p>Enter the time for daily updates and the week day for weekly updates. Monthly updates are done
+						on the first week day of the calender month.</p>
+						<div><label>Enabled</label><mrs:checkbox name="enabled" checked="${scheduler.enabled}"/></div>
+						<div><label>Daily update at</label><input pattern="[0-2][0-9]:[0-5][0-9]" type="text" value="${scheduler.time}" name="time"/></div>
+						<div><label>Weekly update on</label><select name="weekday">
+							<mrs:option value="sunday" selected="${scheduler.weekday}">Sunday</mrs:option>
+							<mrs:option value="monday" selected="${scheduler.weekday}">Monday</mrs:option>
+							<mrs:option value="tuesday" selected="${scheduler.weekday}">Tuesday</mrs:option>
+							<mrs:option value="wednesday" selected="${scheduler.weekday}">Wednesday</mrs:option>
+							<mrs:option value="thursday" selected="${scheduler.weekday}">Thursday</mrs:option>
+							<mrs:option value="friday" selected="${scheduler.weekday}">Friday</mrs:option>
+							<mrs:option value="saturday" selected="${scheduler.weekday}">Saturday</mrs:option>
+						</select>
+						</div>
+						<hr/>
+						<input type='submit' value='Submit'/><input type='reset' value='Reset'/>
+					</fieldset>
+				</form>
+			</div>
+
+			<div id="blast" class="section">
+				<form class="admin_form" method="POST">
+					<input type='hidden' name='submit' value='blast'/>
+					<fieldset>
+						<h3>Blast Queue</h3>
+
+						<table id="blastQueue" cellspacing="0" cellpadding="0" class="select_form status" style="min-width:400px;">
+							<caption>Known jobs</caption>
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>Length</th>
+									<th>Databank</th>
+									<th>Status</th>
+									<th/>
+								</tr>
+							</thead>
+							
+							<tbody>
+							<mrs:if test="${empty blastJobs}">
+								<tr id="nohits">
+									<td colspan="5">There are no known blast jobs.</td>
+								</tr>
+							</mrs:if>
+							</tbody>
+						</table>
+					</fieldset>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:z2="http://www.hekkelman.com/libzeep/m2"
+	xmlns:mrs="https://mrs.cmbi.umcn.nl/mrs-web/ml"
+	xml:lang="en" lang="en">
+<head>
+    <title>M6</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Maarten L. Hekkelman" />
+    <meta name="generator" content="Japi" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+	<link rel="stylesheet" type="text/css" href="css/mrs-style.css" />
+
+	<script src="scripts/jquery/jquery.js" type="text/javascript">
+	</script>
+
+	<script src="scripts/mrs.js" type="text/javascript">
+	</script>
+
+	<mrs:if test="${not mobile}">
+	<script src="scripts/status.js" type="text/javascript">
+	</script>
+	</mrs:if>
+	
+	<mrs:if test="${mobile}">
+	<script src="scripts/status-m.js" type="text/javascript">
+	</script>
+	</mrs:if>
+</head>
+<body>
+	<div z2:replace="header :: #header" />
+	
+	<div id="main">
+		
+		<mrs:if test="${not mobile}">
+		<table id="databanks" class="list status" cellspacing="0" cellpadding="0" style="width:100%;"
+			xmlns:m2="https://mrs.cmbi.umcn.nl/mrs-web/nl/my-ns">
+		<caption>Indexed databanks</caption>
+		<tr>
+			<th><a href="#" onclick="Status.sortTable('databanks', 0);">ID</a> </th>
+			<th><a href="#" onclick="Status.sortTable('databanks', 1);">Name</a></th>
+			<th style="text-align:right"><a href="#" onclick="Status.sortTable('databanks', 2);">Entries</a></th>
+			<th style="text-align:right"><a href="#" onclick="Status.sortTable('databanks', 3);">Size</a></th>
+			<th>Version</th>
+			<th><a href="#" onclick="Status.sortTable('databanks', 5);">Last Update</a></th>
+	        <th colspan="2">Status</th>
+		</tr>
+
+		<tr z2:each="db: ${statusDatabanks}"
+	z2:attr="id=|db-${db.id}|,m2:keys=${'s=' + db.id + '|s=' + (db.name ?: db.id) + '|i=' + (db.entries ?: 0) + '|i=' + (db.size ?: 0) + '||s=' + (db.buildDate ?: '')}" >
+			<td><a z2:href="@{info(db=${db.id})}" z2:text="${db.id}"></a></td>
+			<td><a z2:href="@{info(db=${db.id})}" z2:text="${db.name}"></a></td>
+			<td style="text-align:right"><span z2:if="${db.entries}" z2:text="${#numbers.formatDecimal(db.entries)}"></span></td>
+			<td style="text-align:right; white-space: nowrap;"><span z2:if="${db.size}" z2:text="${#numbers.formatDiskSize(db.size)}"/></td>
+			<td z2:text="${db.version}"></td>
+			<td z2:text="${db.buildDate}"></td>
+			<td><canvas id='update-progress' width="102" height="10" style="display:none;" /></td>
+			<td><span id='update-status' /></td>
+		</tr>
+		</table>
+		</mrs:if>
+
+		<mrs:if test="${mobile}">
+		<ul id="ul-db-list" class="status-list" xmlns:m2="https://mrs.cmbi.umcn.nl/mrs-web/nl/my-ns">
+			<mrs:iterate collection="statusDatabanks" var="db">
+			<li id="db-${db.id}" m2:key="${db.buildDate}">
+				<ul class="status-sub-list">
+					<li>
+						<a href="info?db=${db.id}">${db.id}</a>
+						<span style="float:right">${db.name}</span>
+						<div style="clear: both"/>
+					</li>
+					<li>
+						<div id="active" style="display:none">
+							<canvas id='update-progress' width="102" height="10" style="display:none;" />
+							<span id='update-status' />
+						</div>
+						<div id="idle">
+							<mrs:if test="${db.buildDate}"><li><em>updated</em> ${db.buildDate}</li></mrs:if>
+							<mrs:if test="${empty db.buildDate}"><li><em>not indexed</em></li></mrs:if>
+						</div>
+					</li>
+				</ul>
+			</li>
+			</mrs:iterate>
+		</ul>
+		</mrs:if>
+	</div>
+</body>
+</html>

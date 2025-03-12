@@ -1,0 +1,128 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:mrs="https://mrs.cmbi.umcn.nl/mrs-web/ml"
+	xmlns:z2="http://www.hekkelman.com/libzeep/m2"
+	xml:lang="en" lang="en">
+<head>
+    <title>M6</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Maarten L. Hekkelman" />
+    <meta name="generator" content="Japi" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+	<link rel="stylesheet" type="text/css" href="css/mrs-style.css" />
+
+	<script src="scripts/jquery/jquery.js" type="text/javascript">
+	</script>
+	
+	<script src="scripts/mrs.js" type="text/javascript">
+	</script>
+
+	<script src="scripts/select.js" type="text/javascript">
+	</script>
+
+	<script src="scripts/blast.js" type="text/javascript">
+	</script>
+
+</head>
+<body>
+	<div z2:replace="header :: #header" />
+
+	<div id="main">
+		<div style="margin-bottom: 1em;">
+			<form id="blastForm" method="POST" action="/blast" onsubmit="BlastJobs.submit(); return false;"
+				class="blast_form" >
+				<fieldset>
+
+<!--				<p class="reformatted">NOTE: Please check the reformatted sequence and resubmit</p>-->
+
+					<p>Enter <em>one</em> protein sequence in <em>FastA</em> format</p>
+					<textarea name="query" rows="5" cols="72">${query}</textarea>
+<!--					<li>Or enter filename: <input type="file" name="queryFile" size="50" maxlength="80" /></li>-->
+					<div>
+						<label for="db">Databank to search</label><select id="db" name="db" style="width:10em;">
+							<mrs:options collection="blastdatabanks" value="id" label="name" selected="${blastdb}" />
+						</select>
+					</div>
+					
+					<div id="options">
+						<div><label for="filter">Filter low complexity</label><input type="checkbox" id="filter" z2:checked="${filter}" name="filter" />
+						</div>
+						<div><label>E-value cutoff</label><select name="expect"><mrs:options collection="expectRange" selected="${expect}" /></select></div>
+					</div>
+
+					<p class="hideOptions" style="float:left">advanced options</p>
+					<div id="advancedoptions" style="display:none">
+						<div><h3>Advanced options</h3></div>
+						<div><label>Word size</label><select name="wordSize">
+							<option value="0">Default</option>
+							<mrs:options collection="wordSizeRange" selected="${wordSize}" /></select>
+						</div>
+						<div><label>Scoring matrix</label><select name="matrix" onchange="updateGapValues();">
+							<mrs:options collection="matrices" selected="${matrix}" /></select>
+						</div>
+						<div><label for="gapped">Perform gapped alignment</label>
+								<input id="gapped" type="checkbox" name="gapped" z2:checked="${gapped}" onchange="gappedChanged();" /></div>
+						<div><label>Cost to open a gap</label><select name="gapOpen" onchange="gapOpenChanged();">
+							<option value="-1">Default</option>
+							<mrs:options collection="gapOpenRange" selected="${gapOpen}" /></select>
+						</div>
+						<div><label>Cost to extend a gap</label><select name="gapExtend" onchange="gapExtendChanged();">
+							<option value="-1">Default</option>
+							<mrs:options collection="gapExtendRange" selected="${gapExtend}" /></select>
+						</div>
+						<div><label>Limit reported hits</label><select name="reportLimit">
+							<mrs:options collection="reportLimitRange" 	selected="${reportLimit}" /></select>
+						</div>
+					</div>
+
+					<input type="hidden" name="program" value="blastp" />
+					<div><input type="submit" name="submit" value="Run Blast" style="float:right;" class="submit"/></div>
+				</fieldset>
+			</form>
+
+			<div style="display: inline-block; height: 20em; vertical-align: top; overflow-y: auto; overflow-x: hidden; width: 450px" >
+			<table cellspacing="0" id="jobList" class="status clickable list" style="width:450; padding-right:16px">
+				<caption>Blast results</caption>
+				<thead>
+					<tr>
+						<th class="c1">Nr</th>
+						<th class="c2">ID</th>
+						<th class="c3">Databank</th>
+						<th class="c45" colspan="2">Status</th>
+					</tr>
+				</thead>
+	
+				<tbody>
+				<mrs:if test="${empty blastJobs}">
+					<tr id="nohits">
+						<td colspan="4">No blast results are available since no blast job has been submitted in this session.</td>
+					</tr>
+				</mrs:if>
+				</tbody>
+			</table>
+			</div>
+		</div>
+
+		<div style="clear:both;">&#x00A0;</div>
+		
+		<div class="list" id='selectableList'>
+			<table cellspacing="0" id="blastResult" style="display:none; width:100%">
+				<caption>Blast results for</caption>
+				<tr>
+					<th colspan="2">Nr</th>
+					<th>ID</th>
+					<th>Coverage</th>
+					<th>Description</th>
+					<th>Hsps</th>
+					<th>BitScore</th>
+					<th>E-value</th>
+				</tr>
+				<tbody/>
+			</table>
+		</div>
+	</div>
+	
+	<mrs:include file="select.html" />
+</body>
+</html>

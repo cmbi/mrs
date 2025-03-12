@@ -1,0 +1,961 @@
+/* Style sheet for MRS */
+/* Start with some basics */
+
+* {
+	font-family: sans-serif;
+}
+
+code {
+	font-family: consolas, courier, monospace;
+}
+
+html, body {
+	padding: 0px;
+	margin: 0px;
+	background: #fff;
+}
+
+.search
+{
+	padding: 2px 30px;
+	position: relative;
+	border: 1px solid #666;
+	border-radius: 1em;
+	-moz-box-shadow: inset 0px 1px 4px 		rgba(0,0,0,.2);
+	-webkit-box-shadow: inset 0px 1px 4px 	rgba(0,0,0,.2);
+	box-shadow: inset 0px 1px 4px 			rgba(0,0,0,.2);
+	background: white;
+}
+
+.search-icon:after
+{
+	background: #666;
+	background: rgba(0,0,0,.4);	/* disc */
+	background-image: url(images/icons-18-white.png);
+	background-repeat: no-repeat;
+	background-position: -612px 50%;
+	-moz-border-radius: 9px;
+	-webkit-border-radius: 9px;
+	border-radius: 9px;
+	position: absolute;
+	left: 4px;
+	top: 50%;
+	margin-top: -9px;
+	content: "";
+	width: 18px;
+	height: 18px;
+	opacity: .5;
+}
+
+.search input
+{
+	outline: 0;
+	border: none;
+}
+
+/* Data part of window */
+#main {
+	padding: 4px;
+	margin: 0;
+	font-size: small;
+}
+
+@media all and (min-width: 800px)
+{
+	#main { padding: 8px; }
+}
+
+a {
+	color: #2f506c;
+	text-decoration: none;
+}
+
+a.not-found {
+	color: #666;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+pre, pre * {
+	font-family: monospace;
+	font-size: 9pt;	/* normal doesn't work properly here in FF */
+}
+
+pre a {
+	text-decoration: underline;
+}
+
+textarea {
+	font-family: monospace;
+}
+
+/* the error page */
+.error .label {
+	color: red;
+}
+
+.error ul {
+	list-style-image: none;
+	list-style-type: none;
+	margin: 0px;
+	padding-left: 10px;
+}
+
+/* entry page, highlighting words */
+.highlightwords .highlight {
+	background-color: #c6d4e1;
+}
+
+/* The menu bar */
+ul#menu {
+	list-style-type: none;
+	width: 100%;
+	height: 2em;
+	line-height: 150%;
+	padding: 0px;
+	margin: 0px;
+	background: #44749d;
+	color: white;
+	font-weight: bold;
+	font-size: small;
+}
+
+ul#menu li {
+	background: #44749d;
+	float: left;
+	padding: .2em;
+	margin: 0px;
+}
+
+ul#menu li.help {
+	float: right;
+}
+
+ul#menu li a {
+	display: block;
+	color: white;
+	font-weight: bold;
+	padding: 0 .5em 0 .5em;
+}
+
+ul#menu li a:hover {
+	background-color: #c6d4e1;
+	color: #44749d;
+	text-decoration: none;
+}
+
+/* search bar on top of window */
+.blackbox {
+	background-color: #c6d4e1;
+	color: #2f506c;
+	padding: .4em;
+	border-bottom: solid 1px #44749d;
+}
+
+.blackbox label {
+	vertical-align: middle;
+	height: 100%;
+	font-weight: bold;
+}
+
+.blackbox input[type="submit"] {
+	float: right;
+}
+
+/* Navigation panel, bar above some of the lists */
+.nav {
+	background-color: #ebe7e0;
+	border-bottom: solid 1px #bdb8ad;
+	color: #5e5c56;
+	font-weight: bold;
+	display: block;
+	margin: -4px -4px 4px -4px;
+	padding: 5px;
+}
+
+@media all and (min-width: 800px)
+{
+	.nav {
+		margin: -8px -8px 8px -8px;
+	}
+}
+
+.nav form {
+	display: inline;
+}
+
+.nav span.left {
+	float: left;
+}
+
+.nav span.right {
+	float: right;
+}
+
+.nav span.footer {
+	background-color: green;
+	clear: both;
+}
+
+.nav ul {
+	list-style-image: none;
+	list-style-type: none;
+	margin: 0px;
+	padding: 1px;
+}
+
+.nav li {
+	white-space: nowrap;
+	display: inline;
+	margin: 3px;
+	color: #5e5c56;
+	font-weight: bold;
+}
+
+.nav li.linksource {
+	float: right;
+	font-size: xx-small;
+}
+
+.nav a.selected {
+	color: black;
+	text-decoration: none;
+}
+
+.nav a.selected:hover {
+	color: black;
+	text-decoration: none;
+}
+
+.nav a.selected:hover {
+	color: black;
+	text-decoration: none;
+}
+
+/* result lists */
+table.list {
+	padding: 0px;
+	margin: 0px;
+	vertical-align: top;
+}
+
+@media all and (min-width: 800px)
+{
+	table.list {
+		min-width: 450px;
+	}
+}
+
+.entry caption, .list caption {
+	background-color: #44749d;
+	color: white;
+	font-weight: bold;
+	text-align: left;
+	padding: 3px 5px 3px 5px;
+}
+
+.entry th, .list th {
+	background-color: #c6d4e1;
+	color: #2f506c;
+	border-bottom: solid 1px #44749d;
+	font-weight: bold;
+	text-align: left;
+	text-decoration: none;
+	padding: 2px 5px 2px 5px;
+}
+
+.entry th + th, .list th + th {
+	border-left: 1px solid #44749d;
+}
+
+.entry th a, .list th a {
+	text-decoration: underline;
+}
+
+.entry td, .list td {
+	padding: 2px;
+	padding-left: 4px;
+	margin: 0px;
+	vertical-align: top;
+	border-top: solid 1px #ebe7e0;
+}
+
+.entry table tr:first-child td, table.list tr:first-child td {
+	border-top-width: 0px;
+}
+
+.list .row-title {
+	display: block;
+}
+
+td.right {
+	text-align: right;
+}
+
+.list td.nr {
+	font-weight: bold;
+	text-align: right;
+}
+
+.list tr.feature:hover {
+	background-color: #eaeff4;
+	cursor: pointer;
+}
+
+.list tr.selected {
+	background-color: #c6d4e1;
+}
+
+.list td.delete img {
+	visibility: hidden;
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+.list td.delete:hover img {
+	visibility: visible;
+}
+
+.list a img {
+	border: none 0px;
+}
+
+span.reference {
+	font-size: x-small;
+}
+
+span.reference-label {
+	font-style: italic;
+	font-weight: bold;
+	margin-left: 10px;
+}
+
+/* Box warning a query was relaxed to allow for results */
+div.relaxed, div.no-hits, div.redirect, div.format-error {
+	display: block;
+	background-color: #2f506c;
+	color: white;
+	font-size: large;
+	font-weight: bold;
+	padding: 10px;
+	margin: 0 auto;
+	margin-bottom: 20px;
+}
+
+div.redirect {
+	font-size: small;
+	padding: 4px;
+}
+
+/* a pretty entry */
+.entry table {
+	padding: 0px;
+	margin: 0px;
+	vertical-align: top;
+}
+
+.entry td.sub_entry {
+	padding: 0px;
+}
+
+.entry td.sub_entry td.label {
+	font-style: italic;
+	width: 20%;
+}
+
+.entry table {
+	margin-top: 4px;
+}
+
+.entry div.feature_table table {
+	margin-top: 0px;
+}
+
+.scrolling-sequence {
+	width: 320px;
+	height: 66px;
+	font-family: monospace;
+	font-size: small;
+	overflow: auto;
+	white-space: pre;
+}
+
+.entry .feature_table {
+	height: 200px;
+	width: 100%;
+	overflow: auto;
+}
+
+.entry .feature_table .highlighted {
+	background-color: #ebe7e0;
+}
+
+.entry .sequence .hover-feature {
+	text-decoration: underline;
+}
+
+.entry .sequence .highlighted {
+	font-weight: bold;
+	background-color: #ebe7e0;
+}
+
+/* help text */
+.help a {
+	text-decoration: underline;
+}
+
+.help dt {
+	font-style: italic;
+	padding-bottom: 4px;
+}
+
+.help dd {
+	padding-bottom: 8px;
+}
+
+/*
+	Support for forms with tabsheets
+ */
+
+.tabs {
+	clear: none;
+	vertical-align: top;
+	display: inline-block;
+}
+
+.tabs > ul:first-child {
+	clear: none;
+	display: inline;
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+.tabs > div {
+	border: solid 1px #44749d;
+	margin-top: 1px;
+	padding: 10px;
+}
+
+.tabs > div.ui-tabs-hide {
+	display: none !important;
+}
+
+.tabs > ul:first-child li {
+	border: solid 1px #44749d;
+	display: inline;
+	padding: 2px 16px 1px 16px;
+	margin-right: 4px;
+}
+
+.tabs > ul:first-child li {
+	background-color: #c6d4e1;
+	color: black;
+}
+
+.tabs > ul:first-child li.ui-tabs-selected {
+	background-color: #44749d;
+}
+
+.tabs > ul:first-child li.ui-tabs-selected a {
+	color: white;
+}
+
+.tabs > ul:first-child li.unselected:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.tabs div ul, .options-tab {
+	margin: 0px;
+	padding: 0px;
+	list-style: none;
+}
+
+.tabs div ul li, .options-tab li {
+	padding: 2px;
+}
+
+.tabs div textarea, .options-tab textarea {
+	font-family: monospace;
+}
+
+.box {
+	clear: none;
+	padding-top: 1px;
+	margin-top: 1px;
+	margin-bottom: 10px;
+	border: solid 1px #44749d;
+}
+
+.box ul {
+	list-style-type: none;
+	margin: 5px;
+	padding: 0px;
+	height: auto;
+}
+
+.box li {
+	padding: 3px;
+	height: auto;
+}
+
+#queryCount {
+	color: red;
+}
+
+/* styles for (blast-) alignment views */
+.alignment {
+	white-space: pre;
+	padding: 0px;
+	margin: 0px;
+}
+
+.alignment div {
+	height: 4px;
+}
+
+.alignment br {
+	height: 0px;
+}
+
+.masked {
+	text-decoration: line-through;
+	color: #777;
+}
+
+/* spelling checker */
+.alt caption {
+	text-align: left;
+	font-style: italic;
+	padding-bottom: 2px;
+	white-space: nowrap;
+}
+
+.alt td {
+	vertical-align: top;
+}
+
+.alt tr>td {
+	padding-left: 10px;
+}
+
+.alt td+td {
+	padding-left: 15px;
+}
+
+.alt td.term {
+	font-weight: bold;
+}
+
+/* syntax error highlighting */
+strong.syntax-error {
+	background-color: #e7ff27;
+}
+
+/*
+	Status view, here are the colours for the list
+	that shows the update activities. 
+*/
+table.status tr.error td {
+	background-color: #ecc3c3;
+}
+
+table.status tr.error td.active, ul.status-list li.error {
+	background-color: #ec9a9a;
+}
+
+table.status tr.scheduled, ul.status-list li.scheduled {
+	background-color: #dfeeff;
+}
+
+table.status tr.active td, ul.status-list li.active {
+	background-color: #d9ecc3;
+}
+
+table.status tr.active td.active, ul.status-list li.active {
+	background-color: #c6ec9a;
+}
+
+ul.status-list, ul.status-sub-list
+{
+	list-style-image: none;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+ul.status-list li
+{
+	border-bottom: 1px solid #ebe7e0;
+	padding: 0.1em;
+}
+
+ul.status-sub-list li
+{
+	border-bottom: none;
+}
+
+ul.status-sub-list a
+{
+	font-weight: bold;
+}
+
+ul.status-sub-list li:first-child
+{
+	margin-bottom: .2em;
+}
+
+/* the global selection widget */
+
+div#globalSelection {
+	opacity: 0.9;
+	font-weight: bold;
+	font-size: small;
+	background: #c6d4e1;
+	color: #2f506c;
+	min-height: 3em;
+	width: 100%;
+	position: fixed;
+	z-index: 1;
+	bottom: 0;
+}
+
+div#globalSelection ul {
+	list-style-type: none;
+	line-height: 150%;
+	display: inline-block;
+	font-weight: bold;
+	padding: 2px;
+	margin: 0px;
+	clear: none;
+}
+
+div#globalSelection ul li {
+	display: inline-block;
+	clear: none;
+	padding: 3px;
+	margin: 0px;
+}
+
+div#globalSelection ul li + li:after {
+	content: ", ";
+}
+
+div#globalSelection ul li + li.last:after {
+	content: "";
+}
+
+div#globalSelection input, div#globalSelection select {
+	margin: 5px;
+	float:right;
+}
+
+.admin {
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+.admin table {
+	padding: 0px;
+	margin: 0px;
+}
+
+.admin table caption {
+	background-color: #44749d;
+	color: white;
+	font-weight: bold;
+	text-align: left;
+	padding: 3px 5px 3px 5px;
+}
+
+.admin td {
+	padding: 2px;
+	padding-left: 4px;
+	margin: 0px;
+	vertical-align: top;
+	border-top: solid 1px #ebe7e0;
+	width: 9em;
+}
+
+.admin tr:first-child td {
+	border-top-width: 0px;
+}
+
+.admin td:first-child {
+	font-weight: bold;
+}
+
+.admin table.select_form {
+	width: 125px;
+}
+
+.admin table.select_form td:first-child {
+	font-weight: normal;
+}
+
+.admin table.select_form tr.selected {
+	background-color: #c6d4e1;
+}
+
+.admin table.select_form tr:hover {
+	background: #d4e3f1;
+	cursor: pointer;
+}
+
+.admin td + td {
+	width: auto;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.admin td.admin-edit-text span {
+	margin: -1px;
+	padding: 1px;
+	display: block;
+	border: solid 1px white;
+}
+
+.admin-left {
+	float: left;
+	width: 125px;
+	vertical-align: top;
+	padding-right: 10px;
+}
+
+.admin .admin-right {
+	margin-left: 125px;
+	padding-left: 20px;
+	vertical-align: top;
+}
+
+.admin .admin-clear {
+	clear: both;
+	height: 1px;
+	overflow: hidden;
+	margin: 0;
+}
+
+.tablebox {
+	height: 300px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+
+	border: 1px solid #9E9E9E;
+}
+
+.add-del input {
+	margin-top: 0.4em;
+}
+
+form.admin_form {
+	margin-bottom: 20px;
+}
+
+form.admin_form h3 {
+	background-color: #44749d;
+	color: white;
+	font-weight: bold;
+	text-align: left;
+	padding: 3px 5px 3px 5px;
+}
+
+fieldset {
+	border: 1px solid #9E9E9E;
+}
+
+form h3:first-child {
+	margin-top: 2px;
+}
+
+form.admin_form label, form.admin_form input {
+	display: inline-block;
+}
+
+form.admin_form label {
+	font-weight: bold;
+}
+
+form.admin_form input, form.admin_form select {
+	margin: 2px;
+}
+
+form.admin_form input[type='text'] {
+	width: 400px;
+}
+
+form.admin_form th {
+	background-color: #c6d4e1;
+	color: #2f506c;
+	border-bottom: solid 1px #44749d;
+	font-weight: bold;
+	text-align: left;
+	text-decoration: none;
+	padding: 2px 5px 2px 5px;
+}
+
+form.admin_form th + th {
+	border-left: 1px solid #44749d;
+}
+
+form.admin_form th a {
+	text-decoration: underline;
+}
+
+.admin td input[type='text'], .admin td select {
+	padding: 1px;
+	margin: 0;
+	width: 80px;
+}
+
+.admin label {
+	height: 1.8em;
+}
+
+.admin td div.delete, .aliases span.clickable {
+	padding: 2px;
+	margin: 3px;
+	color: #2f506c;
+	text-decoration: none;
+}
+
+.admin td div.delete:hover, .aliases span.clickable:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.admin td:first-child input[type='text'] {
+	width: 300px;
+}
+
+form.admin_form label {
+	width: 120px;
+}
+
+form.admin_form hr {
+	margin: 15px 0px;
+	border: 0;
+	color: #9E9E9E;
+	background-color: #9E9E9E;
+	height: 1px;
+}
+
+.admin div.aliases {
+	margin-left: 120px;
+	margin-top: -1.9em;
+	padding: 1px; 
+}
+
+.admin div.aliases th {
+	background-color: white;
+	border-width: 0px;
+}
+
+.admin div.aliases input, .admin div.aliases td:first-child input {
+	width: auto;
+}
+
+/*
+	Blast Form
+*/
+
+form.blast_form, form.align_form {
+	display: inline-block;
+	padding-right:1em;
+	vertical-align: top;
+}
+
+form.blast_form p:first-child, form.align_form p:first-child {
+	margin: 3px 0px;
+}
+
+form.blast_form h3 {
+	background-color: #44749d;
+	color: white;
+	font-weight: bold;
+	text-align: left;
+	margin-top: 5px;
+	padding: 3px 5px 3px 5px;
+}
+
+form.blast_form label {
+	width: 160px;
+}
+
+form.blast_form p.reformatted {
+	color: red;
+	display: none;
+}
+
+form.blast_form label, form.blast_form input {
+	display: inline-block;
+}
+
+form.blast_form td select {
+	padding: 1px;
+	margin: 0;
+	width: 80px;
+}
+
+form.blast_form label {
+	height: 1.8em;
+}
+
+form.blast_form p.hideOptions {
+	color: #2f506c;
+	margin: 0px;
+	margin-top: 3px;
+	padding: 0px;
+}
+
+form.blast_form p.hideOptions:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+/* two boxes, one left, the other right */
+
+@media all and (min-width: 800px)
+{
+	.wbox {
+		width: 100%;
+	}
+	
+	.wleft {
+		width: 50%;
+		float: left;
+		padding-right: 10px;
+		vertical-align: top;
+	}
+	
+	.wright {
+		margin-left: 50%;
+		padding-left: 10px;
+		vertical-align: top;
+		border: solid 1px white;
+	}
+	
+	.wclear {
+		clear: both;
+		height: 1px;
+		overflow: hidden;
+		margin: 0;
+		border: solid 1px white;
+	}
+}
+
+ul.browse
+{
+	list-style-image: none;
+	list-style-type: none;
+	margin: 0px;
+	padding-left: 10px;
+}
+
+.jobID {
+	white-space: nowrap;
+	font-family: fixed;
+}
+

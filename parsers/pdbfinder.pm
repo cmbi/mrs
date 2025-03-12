@@ -107,7 +107,7 @@ sub to_fasta
 
         last if (substr($line, 0, 2) eq '//');
 
-        if ($line =~ /^Chain\s*:\s*(\S)/)
+        if ($line =~ /^Ch-Auth-ID\s*:\s*(\S)/)
         {
             $chainid = $1;
         }

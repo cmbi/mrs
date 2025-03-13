@@ -7,6 +7,8 @@ from Bio import SeqIO
 
 from flask import Blueprint, render_template, current_app, request
 
+from frontend.parse import fasta_parsers
+
 
 bp = Blueprint('dashboard', __name__)
 
@@ -57,7 +59,17 @@ def search():
 
                 results[databank_name].append({ "id": id_, "title": title})
 
-    return render_template("browse.html", db=db, q=q, results=results)
+    if len(results) == 1 and len(list(results.values())[0]) == 1:
+
+        databank_name = list(results.keys())[0]
+
+        result = results[databank_name][0]
+
+        request.args = {'db': databank_name, 'q': result['id']}
+
+        return entry()
+    else:
+        return render_template("browse.html", db=db, q=q, results=results)
 
 
 @bp.route("/entry", methods=['GET'])
@@ -80,13 +92,11 @@ def entry():
 
     fasta_path = os.path.join(mrs_directory, f"{db}.m6", "fasta")
 
-    fasta_q = f"|{db}|{q}"
     fasta = ""
-    if os.path.isfile(fasta_path):
-        with open(fasta_path, 'rt') as fasta_file:
-            for record in SeqIO.parse(fasta_file, "fasta"):
-                if fasta_q in record.id:
-                    fasta += f">{record.description}\n{record.seq}"
+    if db in current_app.config["databank_parsers"] and current_app.config["databank_parsers"][db] in fasta_parsers:
+
+        parser = fasta_parsers[current_app.config["databank_parsers"][db]]
+        fasta = parser(db, q, text)
 
     links = []
 

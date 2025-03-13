@@ -13,6 +13,7 @@ def create_app():
     alias_databank_names = set([])
     all_databank_names = []
     databank_formats = {}
+    databank_parsers = {}
     app.config["databanks"] = []
     for databank in mrs_config.find('databanks'):
         if databank.get("enabled") != "true":
@@ -28,6 +29,11 @@ def create_app():
 
         if databank.get("format") is not None:
             databank_formats[databank.get("id")] = databank.get("format")
+
+        if databank.get("parser") is not None:
+            databank_parsers[databank.get("id")] = databank.get("parser")
+
+    app.config["databank_parsers"] = databank_parsers
 
     app.config["directories"] = []
     for directory in mrs_config.find('directories'):

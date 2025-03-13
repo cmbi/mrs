@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block body %}
+	<div id="main">
+
+        <table xmlns="http://www.w3.org/1999/xhtml" cellpadding="0" cellspacing="0"
+            class="list" id="tabel" style="position:relative;">
+
+				<caption>Results for query {{ query }} </caption>
+				<thead>
+					<tr>
+						<th>Databank</th>
+						<th>Hits</th>
+						<th>ID</th>
+						<th>Title</th>
+					</tr>
+				</thead>
+
+                {% for db, results_db in results|dictsort %}
+                    <tbody>
+                        {% for result in results_db %}
+                            {% if loop.index <= 5 %}
+                                <tr>
+                                    <td>{% if loop.index == 1 %} {{ db }} {% endif %}</td>
+                                    <td>{% if loop.index == 1 %} {{ results_db|length }} {% endif %}</td>
+                                    <td><a href="entry?db=pdbfinder&amp;nr=3&amp;q={{ result['id'] }}">{{ result['id'] }}</a></td>
+                                    <td>{{ result['title'] }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                {% endfor %}
+		</table>
+	</div>
+{% endblock %}

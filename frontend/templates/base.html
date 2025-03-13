@@ -34,8 +34,11 @@
                     Search
                     <select name="db" onchange="if (document.getElementById('q').value !== '') document.getElementById('queryForm').submit();" style="width:150px;">
                         <option value="all">All Databanks</option>
-                        {% for databank_name in databanks %}
-                        <option value="{{ databank_name }}">{{ databank_name }}</option>
+                        {% for alias_databank_name in alias_databank_names %}
+                            <option value="{{ alias_databank_name }}">{{ alias_databank_name }}</option>
+                        {% endfor %}
+                        {% for databank_name in all_databank_names %}
+                            <option value="{{ databank_name }}">{{ databank_name }}</option>
                         {% endfor %}
                     </select>
                 </label>

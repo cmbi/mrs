@@ -6,19 +6,32 @@ from flask import Flask
 def create_app():
 
     app = Flask("MRS", static_folder='frontend/static', template_folder='frontend/templates')
+    app.config["mrs_executable"] = "/usr/local/bin/mrs"
 
     mrs_config = ElementTree.parse("/usr/local/etc/mrs/mrs-config.xml").getroot()
 
+    alias_databank_names = set([])
     all_databank_names = []
     app.config["databanks"] = []
     for databank in mrs_config.find('databanks'):
-        app.config["databanks"].append(databank)
-        all_databank_names.append(databank.get("name"))
+        if databank.get("enabled") != "true":
+            continue
 
-    from frontend.wsdl import mrs_search
-    mrs_search.all_databank_names = all_databank_names
-    mrs_search.wsdl_url = "https://mrs.cmbi.umcn.nl/mrsws/search/wsdl"
-    mrs_search.endpoint_url = "http://localhost:18090/mrsws/search"
+        if "aliases" in databank:
+            for alias in databank.get("aliases"):
+                alias_name = alias.get("name")
+                alias_databank_names.add(alias_name)
+
+        app.config["databanks"].append(databank)
+        all_databank_names.append(databank.get("id"))
+
+    app.jinja_env.globals.update(all_databank_names=all_databank_names)
+    app.jinja_env.globals.update(alias_databank_names=alias_databank_names)
+
+    #from frontend.wsdl import mrs_search
+    #mrs_search.all_databank_names = all_databank_names
+    #mrs_search.wsdl_url = "https://mrs.cmbi.umcn.nl/mrsws/search/wsdl"
+    #mrs_search.endpoint_url = "http://localhost:18090/mrsws/search"
 
     from frontend.dashboard.views import bp
     app.register_blueprint(bp)

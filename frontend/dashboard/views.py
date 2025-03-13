@@ -1,6 +1,9 @@
+import os
 from collections import OrderedDict
 from subprocess import run, CalledProcessError
 import traceback
+
+from Bio import SeqIO
 
 from flask import Blueprint, render_template, current_app, request
 
@@ -54,7 +57,40 @@ def search():
 
                 results[databank_name].append({ "id": id_, "title": title})
 
-    return render_template("browse.html", query=request.args.get('q'), results=results)
+    return render_template("browse.html", db=db, q=q, results=results)
+
+
+@bp.route("/entry", methods=['GET'])
+def entry():
+    q = request.args.get('q')
+    db = request.args.get('db')
+
+    p = run([current_app.config["mrs_executable"], 'entry', '-d', db, '-e', q],
+             capture_output=True)
+
+    if p.returncode != 0:
+        raise RuntimeError("mrs returned: \n" + p.stderr.decode("utf_8"))
+
+    text = p.stdout.decode("utf_8")
+
+    mrs_directory = None
+    for directory in current_app.config["directories"]:
+        if directory.get("id") == "mrs":
+            mrs_directory = directory.text
+
+    fasta_path = os.path.join(mrs_directory, f"{db}.m6", "fasta")
+
+    fasta_q = f"|{db}|{q}"
+    fasta = ""
+    if os.path.isfile(fasta_path):
+        with open(fasta_path, 'rt') as fasta_file:
+            for record in SeqIO.parse(fasta_file, "fasta"):
+                if fasta_q in record.id:
+                    fasta += f">{record.description}\n{record.seq}"
+
+    links = []
+
+    return render_template("entry.html", db=db, q=q, text=text, fasta=fasta, links=links)
 
 
 @bp.errorhandler(Exception)

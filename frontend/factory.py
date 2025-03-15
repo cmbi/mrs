@@ -7,6 +7,7 @@ def create_app():
 
     app = Flask("MRS", static_folder='frontend/static', template_folder='frontend/templates')
     app.config["mrs_executable"] = "/usr/local/bin/mrs"
+    app.config["blastp_executable"] = "/usr/bin/blastp"
 
     mrs_config = ElementTree.parse("/usr/local/etc/mrs/mrs-config.xml").getroot()
 
@@ -43,12 +44,10 @@ def create_app():
     app.jinja_env.globals.update(alias_databank_names=alias_databank_names)
     app.jinja_env.globals.update(databank_formats=databank_formats)
 
-    #from frontend.wsdl import mrs_search
-    #mrs_search.all_databank_names = all_databank_names
-    #mrs_search.wsdl_url = "https://mrs.cmbi.umcn.nl/mrsws/search/wsdl"
-    #mrs_search.endpoint_url = "http://localhost:18090/mrsws/search"
-
     from frontend.dashboard.views import bp
+    app.register_blueprint(bp)
+
+    from frontend.api.views import bp
     app.register_blueprint(bp)
 
     return app

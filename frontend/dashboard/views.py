@@ -102,6 +102,13 @@ def entry():
 
     return render_template("entry.html", db=db, q=q, text=text, fasta=fasta, links=links)
 
+@bp.route("/blast", methods=['GET', 'POST'])
+def blast():
+    fasta = request.form.get('fasta', '')
+    db = request.form.get('db', '')
+
+    return render_template("blast.html", db=db, query=fasta)
+
 
 @bp.errorhandler(Exception)
 def exception_error_handler(error):

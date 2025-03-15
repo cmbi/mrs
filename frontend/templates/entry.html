@@ -37,9 +37,9 @@
                 </li>
                 <li>
                     <form id="blastForm" method="post" action="blast">
-                        <input type="hidden" name="db" value="${db}" />
-                        <input type="hidden" name="nr" value="${nr}" />
-                        <input type="submit" name="blast" value="Blast" class="submit" z2:disabled="${not blastable}" />
+                        <input type="hidden" name="db" value="{{ db }}" />
+                        <input type="hidden" name="fasta" value="{{ fasta }}" />
+                        <input type="submit" name="blast" value="Blast" class="submit" {% if fasta|length == 0 %} disabled="true" {% endif %} />
                     </form>
                 </li>
                 <li>

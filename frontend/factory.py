@@ -1,4 +1,5 @@
 from xml.etree import ElementTree
+import os
 
 from flask import Flask
 
@@ -11,10 +12,23 @@ def create_app():
 
     mrs_config = ElementTree.parse("/usr/local/etc/mrs/mrs-config.xml").getroot()
 
+    mrs_directory = None
+
+    app.config["directories"] = []
+    for directory in mrs_config.find('directories'):
+        app.config["directories"].append(directory)
+
+        if directory.get("id") == "mrs":
+            mrs_directory = directory.text
+
+    def is_blastable(db: str) -> bool:
+        return os.path.isfile(os.path.join(mrs_directory, db + ".m6", "blast.psq"))
+
     alias_databank_names = set([])
     all_databank_names = []
     databank_formats = {}
     databank_parsers = {}
+    databanks_blastable = {}
     app.config["databanks"] = []
     for databank in mrs_config.find('databanks'):
         if databank.get("enabled") != "true":
@@ -36,13 +50,10 @@ def create_app():
 
     app.config["databank_parsers"] = databank_parsers
 
-    app.config["directories"] = []
-    for directory in mrs_config.find('directories'):
-        app.config["directories"].append(directory)
-
     app.jinja_env.globals.update(all_databank_names=all_databank_names)
     app.jinja_env.globals.update(alias_databank_names=alias_databank_names)
     app.jinja_env.globals.update(databank_formats=databank_formats)
+    app.jinja_env.globals.update(is_blastable=is_blastable)
 
     from frontend.dashboard.views import bp
     app.register_blueprint(bp)

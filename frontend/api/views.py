@@ -62,6 +62,16 @@ def blast():
 
                     alignment = {}
 
+                    alignment["score"] = int(hsp.find("Hsp_score").text)
+                    alignment["bit_score"] = int(hsp.find("Hsp_bit-score").text)
+                    alignment["evalue"] = float(hsp.find("Hsp_evalue").text)
+
+                    alignment["identity"] = int(hsp.find("Hsp_identity").text)
+                    alignment["similarity"] = int(hsp.find("Hsp_positive").text)
+                    alignment["gaps"] = int(hsp.find("Hsp_gaps").text)
+
+                    alignment["length"] = int(hsp.find("Hsp_align-len").text)
+                    alignment["midline"] = hsp.find("Hsp_midline").text
                     alignment["query_alignment"] = hsp.find('Hsp_qseq').text
                     alignment["query_start"] = int(hsp.find('Hsp_query-from').text)
                     alignment["query_end"] = int(hsp.find('Hsp_query-to').text)

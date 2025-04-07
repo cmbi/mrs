@@ -2,6 +2,7 @@ from xml.etree import ElementTree
 import os
 
 from flask import Flask
+from celery import Celery
 
 
 def create_app():
@@ -62,3 +63,14 @@ def create_app():
     app.register_blueprint(bp)
 
     return app
+
+def create_celery_app(app):  # pragma: no cover
+
+    mrs_config = ElementTree.parse("/usr/local/etc/mrs/mrs-config.xml").getroot()
+
+    celery = Celery(__name__,
+        backend=mrs_config.find("celery").get("backend"),
+        broker=mrs_config.find("celery").get("broker"),
+    )
+
+    return celery

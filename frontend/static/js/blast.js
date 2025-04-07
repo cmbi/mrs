@@ -1040,7 +1040,7 @@ BlastJobs = {
 					
 					// apparently, a td is not clickable?
 					var img = document.createElement('img');
-					img.src = 'images/edit-delete.png';
+					img.src = 'static/images/edit-delete.png';
 					
 					img.job = newJobs[i];
 					jQuery(img).click(function() {

@@ -10,77 +10,49 @@ import xml.etree.ElementTree as ET
 from Bio import SeqIO
 
 from flask import Blueprint, render_template, current_app, request, jsonify
+import celery
 
-from frontend.parse import fasta_parsers
-
-
-bp = Blueprint('api', __name__, url_prefix="/api")
+from frontend.tasks import blast
 
 
-@bp.route("/blast", methods=['POST'])
-def blast():
+bp = Blueprint('api', __name__, url_prefix="/ajax")
+
+
+@bp.route("/blast/submit", methods=['POST'])
+def blast_submit() -> str:
 
     data = request.get_json()
+    if data is None:
+        return ""
 
-    run_id = uuid4().hex
-    run_path = os.path.join(gettempdir(), run_id)
-    os.mkdir(run_path)
+    task = blast.s(data["query"], data["db"], data, data["reportLimit"])
 
-    try:
-        mrs_directory = None
-        for directory in current_app.config["directories"]:
-            if directory.get("id") == "mrs":
-                mrs_directory = directory.text
+    result = task.delay()
 
-        db_path = os.path.join(mrs_directory, data["db"] + ".m6", "blast")
+    return result.id
 
-        fasta_path = os.path.join(run_path, "fasta")
-        with open(fasta_path, 'wt') as fasta_file:
-            fasta_file.write(data["query"])
 
-        output_path = os.path.join(run_path, "output")
+@bp.route("/blast/status", methods=['POST'])
+def blast_status() -> str:
 
-        run([current_app.config["blastp_executable"], '-query', fasta_path, '-db', db_path, "-outfmt", "5", "-out", output_path],
-            check=True)
+    data = request.get_json()
+    if data is None:
+        return ""
 
-        xml = ET.parse(output_path)
-    finally:
-        rmtree(run_path)
+    task_id = data["id"]
 
-    results = []
-    iterations = xml.find('BlastOutput_iterations')
-    for it in iterations.findall('Iteration'):
-        for hits in it.findall('Iteration_hits'):
-            for hit in hits.findall('Hit'):
+    result = celery.AsyncResult(task_id)
 
-                result = {}
-                result["header"] = hit.find('Hit_def').text
-                result["alignments"] = []
+    return result.status
 
-                hsps = hit.find('Hit_hsps')
-                for hsp in hsps.findall('Hsp'):
 
-                    alignment = {}
+@bp.route("/blast/result/", methods=['GET'])
+def blast_result() -> str:
 
-                    alignment["score"] = int(hsp.find("Hsp_score").text)
-                    alignment["bit_score"] = int(hsp.find("Hsp_bit-score").text)
-                    alignment["evalue"] = float(hsp.find("Hsp_evalue").text)
+    task_id = request.args.get('job')
+    if task_id is None:
+        return ""
 
-                    alignment["identity"] = int(hsp.find("Hsp_identity").text)
-                    alignment["similarity"] = int(hsp.find("Hsp_positive").text)
-                    alignment["gaps"] = int(hsp.find("Hsp_gaps").text)
+    result = celery.AsyncResult(task_id)
 
-                    alignment["length"] = int(hsp.find("Hsp_align-len").text)
-                    alignment["midline"] = hsp.find("Hsp_midline").text
-                    alignment["query_alignment"] = hsp.find('Hsp_qseq').text
-                    alignment["query_start"] = int(hsp.find('Hsp_query-from').text)
-                    alignment["query_end"] = int(hsp.find('Hsp_query-to').text)
-                    alignment["subject_alignment"] = hsp.find('Hsp_hseq').text
-                    alignment["subject_start"] = int(hsp.find('Hsp_hit-from').text)
-                    alignment["subject_end"] = int(hsp.find('Hsp_hit-to').text)
-
-                    result["alignments"].append(alignment)
-
-                results.append(result)
-
-    return jsonify(results)
+    return jsonify(result.get())

@@ -10,20 +10,17 @@ import xml.etree.ElementTree as ET
 from Bio import SeqIO
 
 from flask import Blueprint, render_template, current_app, request, jsonify
-import celery
 
 from frontend.tasks import blast
 
 
-bp = Blueprint('api', __name__, url_prefix="/ajax")
+bp = Blueprint('api', __name__, url_prefix="/api")
 
 
 @bp.route("/blast/submit", methods=['POST'])
 def blast_submit() -> str:
 
     data = request.get_json()
-    if data is None:
-        return ""
 
     task = blast.s(data["query"], data["db"], data, data["reportLimit"])
 
@@ -36,23 +33,34 @@ def blast_submit() -> str:
 def blast_status() -> str:
 
     data = request.get_json()
-    if data is None:
-        return ""
 
-    task_id = data["id"]
+    task_ids = data["jobs"].split(';')
 
-    result = celery.AsyncResult(task_id)
+    from frontend.application import celery as celery_app
 
-    return result.status
+    statuses = []
+    for task_id in task_ids:
 
+        result = celery_app.AsyncResult(task_id)
+
+        status = {
+            "id": task_id,
+            "status": result.status.lower(),
+        }
+
+        statuses.append(status)
+
+    return jsonify(statuses)
 
 @bp.route("/blast/result/", methods=['GET'])
 def blast_result() -> str:
 
-    task_id = request.args.get('job')
-    if task_id is None:
-        return ""
+    data = request.get_json()
 
-    result = celery.AsyncResult(task_id)
+    task_id = data['job']
+    hit_number = data['hit']
+
+    from frontend.application import celery as celery_app
+    result = celery_app.AsyncResult(task_id)
 
     return jsonify(result.get())

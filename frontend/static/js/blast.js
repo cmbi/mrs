@@ -420,7 +420,7 @@ BlastResult.prototype.fetchHits = function() {
 	}
 	
 	var result = this;
-	jQuery.getJSON("ajax/blast/result", { job: this.id },
+	jQuery.getJSON(application_root + "/api/blast/result", { job: this.id },
 		function(data, status) {
 			if (status == "success") 
 			{
@@ -566,7 +566,7 @@ BlastResult.prototype.selectHit = function(hit) {
 		// fetch the Hsps
 		var result = this;
 		
-		jQuery.getJSON("ajax/blast/result", { job: this.id, hit: hit.nr },
+		jQuery.getJSON(application_root + "/api/blast/result", { job: this.id, hit: hit.nr },
 			function(data, status, jqXHR) {
 				if (status == "success")
 				{
@@ -940,13 +940,19 @@ BlastJobs = {
 	
 		var jobstr;
 		for (var i = 0; i < BlastJobs.jobs.length; ++i) {
-			if (BlastJobs.jobs[i].remoteID == null || BlastJobs.jobs[i].remoteID == "undefined")
+			if (BlastJobs.jobs[i].remoteID == null || BlastJobs.jobs[i].remoteID == "undefined") {
+
+                console.log("poll skip " + i + "th job for having no remoteID");
+
 				continue;
+            }
 			if (BlastJobs.jobs[i].status == "new" ||
 				BlastJobs.jobs[i].status == "stored" ||
 				BlastJobs.jobs[i].status == "queued" ||
 				BlastJobs.jobs[i].status == "running")
 			{
+                console.log("poll add " + BlastJobs.jobs[i].remoteID);
+
 				if (jobstr == null) {
 					jobstr = '';
 				} else {
@@ -957,7 +963,9 @@ BlastJobs = {
 		}
 		
 		if (jobstr != null) {
-			jQuery.post("ajax/blast/status", { jobs: jobstr }, function(data, status) {
+            console.log("poll == null:" + (jobstr == null));
+
+			jQuery.post(application_root + "/api/blast/status", { jobs: jobstr }, function(data, status) {
 					if (status == "success") {
 						for (i in data) {
 							for (j in BlastJobs.jobs) {
@@ -967,7 +975,7 @@ BlastJobs = {
 							}
 						}
 					}
-				}, "json");
+				}, dataType="json");
 		}
 	
 		BlastJobs.t = setTimeout("BlastJobs.poll()", 2500);
@@ -1098,7 +1106,7 @@ BlastJobs = {
 			
 			BlastJobs.add(job);
 
-			jQuery.post("ajax/blast/submit", job.getData(), function(data, status, jqXHR) {
+			jQuery.post(application_root + "/api/blast/status", job.getData(), dataType="json", function(data, status, jqXHR) {
 				if (status == "success")
 				{
 					if (data.error != null) {

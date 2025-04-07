@@ -16,7 +16,7 @@ from frontend.parse import fasta_parsers
 
 
 
-@celery_app.task
+@celery_app.task(queue="mrs_blast")
 def blast(query: str, db: str, params: Dict[str, Union[str, float, int, bool]], report_limit: int):
 
     run_id = uuid4().hex

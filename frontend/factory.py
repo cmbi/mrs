@@ -2,12 +2,17 @@ from xml.etree import ElementTree
 import os
 
 from flask import Flask
+
 from celery import Celery
 
 
 def create_app():
 
     app = Flask("MRS", static_folder='frontend/static', template_folder='frontend/templates')
+
+    from frontend.middleware import ReverseProxied
+    app.wsgi_app = ReverseProxied(app.wsgi_app)
+
     app.config["mrs_executable"] = "/usr/local/bin/mrs"
     app.config["blastp_executable"] = "/usr/bin/blastp"
 
@@ -68,9 +73,10 @@ def create_celery_app(app):  # pragma: no cover
 
     mrs_config = ElementTree.parse("/usr/local/etc/mrs/mrs-config.xml").getroot()
 
-    celery = Celery(__name__,
-        backend=mrs_config.find("celery").get("backend"),
-        broker=mrs_config.find("celery").get("broker"),
-    )
+    celery = Celery("MRS")
+    celery.conf["result_backend"] = "redis://localhost/0"
+    celery.conf["broker_url"] = "amqp://guest:guest@localhost"
+    celery.conf["accept_content"] = ["json"]
+    celery.conf["imports"] = ['frontend.tasks']
 
     return celery

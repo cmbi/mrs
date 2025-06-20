@@ -11,8 +11,6 @@ from Bio import SeqIO
 
 from flask import Blueprint, render_template, current_app, request, jsonify
 
-from frontend.tasks import blast
-
 
 bp = Blueprint('api', __name__, url_prefix="/api")
 
@@ -22,11 +20,15 @@ def blast_submit() -> str:
 
     data = request.get_json()
 
+    from frontend.tasks import blast
+
     task = blast.s(data["query"], data["db"], data, data["reportLimit"])
 
     result = task.delay()
 
-    return result.id
+    response = {"clientId": result.id, "status": result.status.lower()}
+
+    return jsonify(response)
 
 
 @bp.route("/blast/status", methods=['POST'])
@@ -48,6 +50,18 @@ def blast_status() -> str:
             "status": result.status.lower(),
         }
 
+        if result.status == "SUCCESS":
+            rs = result.get()
+
+            status['hitCount'] = len(rs)
+            status['bestEValue'] = min([r['evalue'] for r in rs])
+
+        elif result.status == "FAILURE":
+            try:
+                result.get()
+            except Exception as e:
+                status['error'] = str(e)
+
         statuses.append(status)
 
     return jsonify(statuses)
@@ -55,10 +69,8 @@ def blast_status() -> str:
 @bp.route("/blast/result/", methods=['GET'])
 def blast_result() -> str:
 
-    data = request.get_json()
-
-    task_id = data['job']
-    hit_number = data['hit']
+    task_id = request.args['job']
+    hit_number = request.args.get('hit')
 
     from frontend.application import celery as celery_app
     result = celery_app.AsyncResult(task_id)

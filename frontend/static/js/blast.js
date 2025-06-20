@@ -264,7 +264,7 @@ BlastJob.prototype = {
 			this.queryID = response.qid;
 		}
 		
-		if (this.status == 'finished') {
+		if (this.status == 'success') {
 			this.hitCount = response.hitCount;
 			this.bestEValue = response.bestEValue;
 		}
@@ -289,7 +289,7 @@ BlastJob.prototype = {
 		}
 	
 		switch (this.status) {
-			case 'finished': {
+			case 'success': {
 				this.hitCount = this.hitCount;
 				this.bestEValue = this.bestEValue;
 				
@@ -306,7 +306,7 @@ BlastJob.prototype = {
 				}
 				break;
 			}
-			case 'error': {
+			case 'failure': {
 				if (this.error != null) {
 					$(row.cells[3]).text(this.error);
 				} else {
@@ -315,12 +315,12 @@ BlastJob.prototype = {
 				className += ' error';
 				break;
 			}
-			case 'queued': {
-				$(row.cells[3]).text('queued');
+			case 'pending': {
+				$(row.cells[3]).text('pending');
 				break;
 			}
-			case 'running': {
-				$(row.cells[3]).text('running');
+			case 'started': {
+				$(row.cells[3]).text('started');
 				className += ' active';
 				break;
 			}
@@ -413,7 +413,7 @@ BlastResult.colorTable = ['#991F5C', '#5C1F99', '#1F3399', '#1F7099', '#1F9999']
 
 BlastResult.prototype.fetchHits = function() {
 	// fetch the hit list from the server
-	if (this.job.status == 'running' || this.job.status == 'queued')
+	if (this.job.status == 'status' || this.job.status == 'pending')
 	{
 		jQuery("#blastResult").fadeOut();
 		return;
@@ -438,8 +438,8 @@ BlastResult.prototype.fetchHits = function() {
 
 BlastResult.prototype.updateResultList = function() {
 	var result = this;
-	var resultList = document.getElementById('blastResult');
-//	resultList.style.display = '';
+
+    var resultList = document.getElementById("blastResult");
 
 	jQuery(resultList).fadeOut("fast", function() {
 		result.updateResultList2(resultList);
@@ -448,23 +448,22 @@ BlastResult.prototype.updateResultList = function() {
 
 BlastResult.prototype.updateResultList2 = function(resultList) {
 	// remove previous results
-	while (resultList.tBodies[0].rows.length > 0) {
-		resultList.tBodies[0].deleteRow(resultList.tBodies[0].rows.length - 1);
-	}
-	
-	$(resultList.caption).text("Blast results for " + this.job.queryID);
+    resultList.tBodies[0].innerHTML = "";
+    resultList.caption.textContent = "Blast results for " + this.job.queryID;
 	
 	if (this.hits == null) {
 		this.fetchHits();
 		return;
 	}
+
+    var tbody = resultList.tBodies[0];
 	
 	for (h in this.hits) {
 		var hit = this.hits[h];
+
 		hit.job = this.job;	// store
 		
-		var row = resultList.tBodies[0].insertRow(-1);
-		
+        var row = tbody.insertRow(-1);
 		row.className = 'clickable';
 		row.id = this.job.localID + '.' + hit.nr;
 		row.result = this;
@@ -474,32 +473,32 @@ BlastResult.prototype.updateResultList2 = function(resultList) {
 		});
 		
 		// select checkbox
-		var cell = row.insertCell(row.cells.length);
-		cell.appendChild(GlobalSelection.createCheckbox(hit.db, hit.doc, hit.seq));
+		var cell = row.insertCell(-1);
+		cell.appendChild(GlobalSelection.createCheckbox(hit.db, hit.id, hit.chain));
 
 		// Nr
-		cell = row.insertCell(row.cells.length);
-		$(cell).text(hit.nr);
+		var cell = row.insertCell(-1);
+        cell.textContent = hit.nr;
 		cell.className = 'nr';
 		
 		// ID
-		cell = row.insertCell(row.cells.length);
+        var cell = row.insertCell(-1);
 		cell.innerHTML =
-			"<a href='link?db=" + escape(hit.db) + "&amp;ix=id&amp;id=" + escape(hit.doc) + "' onclick='doStopPropagation(event);'>" +
-			hit.doc + "</a>";
-		if (hit.seq.length > 0) {
-			cell.innerHTML += '.' + hit.seq;
+			"<a href='link?db=" + escape(hit.db) + "&amp;ix=id&amp;id=" + escape(hit.id) + "' onclick='doStopPropagation(event);'>" +
+			hit.id + "</a>";
+		if (hit.length > 0) {
+			cell.innerHTML += '.' + hit.chain;
 		}
 		
 		// coverage
-		cell = row.insertCell(row.cells.length);
+        var cell = row.insertCell(-1);
 		cell.width = 100;
 		cell.className = 'alignment';
-		
+
 		// HTML 5 canvas
-		var canvas = document.createElement('canvas');
+        var canvas = document.createElement('canvas');
 		if (canvas != null && canvas.getContext != null) {
-			cell.appendChild(canvas);
+            cell.appendChild(canvas);
 			
 			canvas.height = 4;
 			canvas.width = 100;
@@ -507,53 +506,51 @@ BlastResult.prototype.updateResultList2 = function(resultList) {
 			var ctx = canvas.getContext('2d');
 			if (ctx != null)
 			{
-				if (hit.coverage.start > 0)
+				if (hit.query_start > 0)
 				{
 					ctx.fillStyle = '#CCCCCC';
-					ctx.fillRect(0, 0, hit.coverage.start, 4);
+					ctx.fillRect(0, 0, canvas.width * hit.query_start / hit.query_length, 4);
 				}
 				
-				ctx.fillStyle = BlastResult.colorTable[hit.coverage.color - 1];
-				ctx.fillRect(hit.coverage.start, 0, hit.coverage.start + hit.coverage.length, 4);
+				//ctx.fillStyle = BlastResult.colorTable[hit.coverage.color - 1];
+                ctx.fillStyle = '#991F5A';
+				ctx.fillRect(canvas.width * hit.query_start / hit.query_length, 0, canvas.width * hit.query_end / hit.query_length, 4);
 				
-				if (hit.coverage.start + hit.coverage.length < 100)
+				if (hit.query_end < hit.query_length)
 				{
 					ctx.fillStyle = '#CCCCCC';
-					ctx.fillRect(hit.coverage.start + hit.coverage.length, 0, 100, 4);
+					ctx.fillRect(canvas.width * hit.query_end / hit.query_length, 0, canvas.width, 4);
 				}
 			}
 		}
 		
 		// Description
-		cell = row.insertCell(row.cells.length);
-		$(cell).text(hit.desc);
+        var cell = row.insertCell(-1);
+		$(cell).text(hit.header);
 
 		// Hsps
-		cell = row.insertCell(row.cells.length);
-		if (typeof hit.hsps == "object") {
-			$(cell).text(hit.hsps.length);
-		} else {
-			$(cell).text(hit.hsps);
-		}
+        var cell = row.insertCell(-1);
+        $(cell).text(hit.hsps.length);
 
 		// BitScore
-		cell = row.insertCell(row.cells.length);
-		$(cell).text(hit.bitScore);
+        var cell = row.insertCell(-1);
+		$(cell).text(hit.bit_score);
 
 		// Expect
-		cell = row.insertCell(row.cells.length);
-		$(cell).text(hit.expect.toPrecision(3));
-		
-		// and reserve some space for the hsps
-		row = resultList.tBodies[0].insertRow(-1);
-		row.style.display = 'none';
-		cell = row.insertCell(row.cells.length);
-		cell = row.insertCell(row.cells.length);
-		cell.colSpan = 7;
+        var cell = row.insertCell(-1);
+		$(cell).text(hit.evalue.toPrecision(3));
+
+        // and reserve some space for the hsps
+        row = resultList.tBodies[0].insertRow(-1);
+        row.style.display = 'none';
+        cell = row.insertCell(row.cells.length);
+        cell = row.insertCell(row.cells.length);
+        cell.colSpan = 7;
 	}
 }
 
 BlastResult.prototype.selectHit = function(hit) {
+
 	var row = document.getElementById(this.job.localID + '.' + hit.nr);
 	row = row.nextSibling;
 	
@@ -565,7 +562,6 @@ BlastResult.prototype.selectHit = function(hit) {
 	} else {
 		// fetch the Hsps
 		var result = this;
-		
 		jQuery.getJSON(application_root + "/api/blast/result", { job: this.id, hit: hit.nr },
 			function(data, status, jqXHR) {
 				if (status == "success")
@@ -583,15 +579,16 @@ BlastResult.prototype.selectHit = function(hit) {
 }
 
 BlastResult.prototype.updateResultHsps = function(hit, row) {
+
 	var cell = row.cells[1];
 	$(cell).text('');
-	
+
 	// create a new table to hold the hsp info
 	var table = document.createElement('table');
 	table.cellSpacing = 0;
 	table.width = '100%';
 	cell.appendChild(table);
-	
+
 	var tHead = table.createTHead();
 	var row = tHead.insertRow(0);
 	var th = ['Hsp nr', 'Alignment', 'Score', 'Bitscore', 'E-value', 'Length', 'Identity', 'Similarity', 'Gaps' ];
@@ -637,27 +634,34 @@ BlastResult.prototype.updateResultHsps = function(hit, row) {
 			var ctx = canvas.getContext('2d');
 			if (ctx != null)
 			{
-				var x = hsp.ql[0];
+                var x0 = 0;
+                var x1 = hsp.query_start;
+                var x2 = hsp.query_end;
+                var x3 = hit.query_length;
 				
 				ctx.fillStyle = '#E58AB8';
-				ctx.fillRect(x, 0, x + hsp.ql[1], 4);			x += hsp.ql[1];
+				ctx.fillRect(x0, 0, x1, 4);
 				ctx.fillStyle = '#991F5A';
-				ctx.fillRect(x, 0, x + hsp.ql[2], 4);			x += hsp.ql[2];
+				ctx.fillRect(x1, 0, x2, 4);
 				ctx.fillStyle = '#e58AB8';
-				ctx.fillRect(x, 0, x + hsp.ql[3], 4);			x += hsp.ql[3];
-				if (x < 150) {
-					ctx.clearRect(x, 0, 150, 4);
+				ctx.fillRect(x2, 0, x3, 4);
+				if (x3 < 150) {
+					ctx.clearRect(x3, 0, 150, 4);
 				}
 				
-				x = hsp.sl[0];
+                var x0 = 0;
+                var x1 = hsp.subject_start;
+                var x2 = hsp.subject_end;
+                var x3 = hit.subject_length;
+
 				ctx.fillStyle = '#8AC7E5';
-				ctx.fillRect(x, 4, x + hsp.sl[1], 8);			x += hsp.sl[1];
+				ctx.fillRect(x0, 4, x1, 8);
 				ctx.fillStyle = '#1F7099';
-				ctx.fillRect(x, 4, x + hsp.sl[2], 8);			x += hsp.sl[2];
+				ctx.fillRect(x1, 4, x2, 8);
 				ctx.fillStyle = '#8AC7E5';
-				ctx.fillRect(x, 4, x + hsp.sl[3], 8);			x += hsp.sl[3];
-				if (x < 150) {
-					ctx.clearRect(x, 4, 150, 8);
+				ctx.fillRect(x2, 4, x3, 8);
+				if (x3 < 150) {
+					ctx.clearRect(x3, 4, 150, 8);
 				}
 			}
 		}
@@ -675,30 +679,30 @@ BlastResult.prototype.updateResultHsps = function(hit, row) {
 		// e-value
 		cell = row.insertCell(row.cells.length);
 		cell.style.textAlign = 'right';
-		$(cell).text(hsp.expect.toPrecision(3));
+		$(cell).text(hsp.evalue.toPrecision(3));
 		
 		// length
 		cell = row.insertCell(row.cells.length);
 		cell.style.textAlign = 'right';
-		$(cell).text(hsp.queryAlignment.length);
+		$(cell).text(hsp.query_alignment.length);
 		
 		// identity
 		cell = row.insertCell(row.cells.length);
 		cell.style.textAlign = 'right';
 		cell.innerHTML = hsp.identity + ' (' +
-			Math.floor(100 * hsp.identity / hsp.queryAlignment.length) + '%)';
+			Math.floor(100 * hsp.identity / hsp.query_alignment.length) + '%)';
 		
 		// similarity
 		cell = row.insertCell(row.cells.length);
 		cell.style.textAlign = 'right';
-		cell.innerHTML = hsp.positive + ' (' +
-			Math.floor(100 * hsp.positive / hsp.queryAlignment.length) + '%)';
+		cell.innerHTML = hsp.similarity + ' (' +
+			Math.floor(100 * hsp.similarity / hsp.query_alignment.length) + '%)';
 		
 		// gaps
 		cell = row.insertCell(row.cells.length);
 		cell.style.textAlign = 'right';
 		cell.innerHTML = hsp.gaps + ' (' +
-			Math.floor(100 * hsp.gaps / hsp.queryAlignment.length) + '%)';
+			Math.floor(100 * hsp.gaps / hsp.query_alignment.length) + '%)';
 		
 		// and some space for the alignment
 		row = table.tBodies[0].insertRow(-1);
@@ -735,9 +739,9 @@ BlastResult.prototype.selectHsp = function(hitNr, hspNr) {
 BlastResult.prototype.calculateAlignment = function(hsp) {
 	hsp.alignment = 'Hello, world!';
 
-	var qOffset = hsp.queryStart;
-	var sOffset = hsp.subjectStart;
-	var alignmentLength = hsp.queryAlignment.length;
+	var qOffset = hsp.query_start;
+	var sOffset = hsp.subject_start;
+	var alignmentLength = hsp.query_alignment.length;
 	
 	hsp.alignment = '';
 	
@@ -748,8 +752,8 @@ BlastResult.prototype.calculateAlignment = function(hsp) {
             stringLength = 60;
         }
 
-        var q = hsp.queryAlignment.substr(offset, stringLength);
-        var s = hsp.subjectAlignment.substr(offset, stringLength);
+        var q = hsp.query_alignment.substr(offset, stringLength);
+        var s = hsp.subject_alignment.substr(offset, stringLength);
 
 		if (hsp.alignment.length > 1) {
 			hsp.alignment += '\n';
@@ -757,7 +761,7 @@ BlastResult.prototype.calculateAlignment = function(hsp) {
 
         hsp.alignment += "Q: ";
         qOffset += extendAlignment(qOffset, q, hsp);
-        hsp.alignment += "           " + hsp.midLine.substr(offset, stringLength) + '\n';
+        hsp.alignment += "           " + hsp.midline.substr(offset, stringLength) + '\n';
         hsp.alignment += "S: ";
         sOffset += extendAlignment(sOffset, s, hsp);
 
@@ -941,18 +945,13 @@ BlastJobs = {
 		var jobstr;
 		for (var i = 0; i < BlastJobs.jobs.length; ++i) {
 			if (BlastJobs.jobs[i].remoteID == null || BlastJobs.jobs[i].remoteID == "undefined") {
-
-                console.log("poll skip " + i + "th job for having no remoteID");
-
 				continue;
             }
 			if (BlastJobs.jobs[i].status == "new" ||
-				BlastJobs.jobs[i].status == "stored" ||
-				BlastJobs.jobs[i].status == "queued" ||
-				BlastJobs.jobs[i].status == "running")
+			    BlastJobs.jobs[i].status == "stored" ||
+			    BlastJobs.jobs[i].status == "pending" ||
+				BlastJobs.jobs[i].status == "started" )
 			{
-                console.log("poll add " + BlastJobs.jobs[i].remoteID);
-
 				if (jobstr == null) {
 					jobstr = '';
 				} else {
@@ -963,21 +962,23 @@ BlastJobs = {
 		}
 		
 		if (jobstr != null) {
-            console.log("poll == null:" + (jobstr == null));
-
-			jQuery.post(application_root + "/api/blast/status", { jobs: jobstr }, function(data, status) {
-					if (status == "success") {
-						for (i in data) {
-							for (j in BlastJobs.jobs) {
-								if (BlastJobs.jobs[j].remoteID == data[i].id) {
-									BlastJobs.jobs[j].setStatus(data[i]);
-								}
-							}
-						}
-					}
-				}, dataType="json");
+            jQuery.ajax({
+                type: "POST",
+                dataType: "json",
+                contentType: 'application/json',
+                url: application_root + "/api/blast/status",
+                data: JSON.stringify({ jobs: jobstr }),
+                success: function(response) {
+                    for (i in response) {
+                        for (j in BlastJobs.jobs) {
+                            if (BlastJobs.jobs[j].remoteID == response[i].id) {
+                                BlastJobs.jobs[j].setStatus(response[i]);
+                            }
+                        }
+                    }
+                }
+            });
 		}
-	
 		BlastJobs.t = setTimeout("BlastJobs.poll()", 2500);
 	},
 	
@@ -1101,28 +1102,34 @@ BlastJobs = {
 			}
 			
 			if (job.validate() == false) {
+
 				return;
 			}
+        	BlastJobs.add(job);
+            var localID = job.localID;
 			
-			BlastJobs.add(job);
+            jQuery.ajax({
+                url: application_root + "/api/blast/submit",
+                data: JSON.stringify(job.getData()),
+                dataType: "json",
+                type: "POST",
+                contentType: 'application/json',
+                success: function(response) {
 
-			jQuery.post(application_root + "/api/blast/status", job.getData(), dataType="json", function(data, status, jqXHR) {
-				if (status == "success")
-				{
-					if (data.error != null) {
-						alert(data.error);
-						BlastJobs.remove(data.clientId);
-					} else {
-						var job = BlastJobs.get(data.clientId);
-						if (job == null) {
-							throw "Response for unknown client id " + data.clientId;
-						}
-						job.setStatus(data);
-						BlastJobs.store();
-					}
-				}
-			}, "json");
-			
+                    var job = BlastJobs.get(localID);
+
+                    job.remoteID = response.clientId;
+                    job.setStatus(response);
+
+                    BlastJobs.store();
+                },
+                error: function(error) {
+
+                    BlastJobs.remove(localID)
+                    alert(error);
+                }
+            });
+
 			BlastJobs.poll();
 		}
 		catch (e) {

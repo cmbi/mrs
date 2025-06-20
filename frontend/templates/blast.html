@@ -55,8 +55,7 @@
 						<div><h3>Advanced options</h3></div>
 						<div><label>Word size</label>
                             <select name="wordSize">
-                                <option value="0" selected="selected">0</option>
-                                <option value="2">2</option>
+                                <option value="2" selected="selected">2</option>
                                 <option value="3">3</option>
                                 <option value="4">4</option>
 						    </select>
@@ -80,20 +79,31 @@
                         </div>
 						<div><label>Cost to open a gap</label>
                             <select name="gapOpen" onchange="gapOpenChanged();">
-							<option value="-1" selected="selected">1</option>
-                            {% for n in range(2, 15) %}
-                                <option value="-{{n}}">{{n}}</option>
-                            {% endfor %}
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+							<option value="9" selected="selected">9</option>
+							<option value="10">10</option>
+							<option value="11">11</option>
+							<option value="12">12</option>
+							<option value="13">13</option>
 						    </select>
 						</div>
-						<div><label>Cost to extend a gap</label><select name="gapExtend" onchange="gapExtendChanged();">
-                                <option value="-1" selected="selected">1</option>
-                                <option value="-2">2</option>
-                                <option value="-3">3</option>
-                                <option value="-4">4</option>
+						<div><label>Cost to extend a gap</label>
+                            <select name="gapExtend" onchange="gapExtendChanged();">
+                                <option value="1" selected="selected">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
 						    </select>
 						</div>
-						<div><label>Limit reported hits</label><select name="reportLimit">
+						<div><label>Limit reported hits</label>
+                            <select name="reportLimit">
                                 <option value="100">100</option>
                                 <option value="250" selected="selected">250</option>
                                 <option value="500">500</option>
@@ -135,16 +145,18 @@
 		<div class="list" id='selectableList'>
 			<table cellspacing="0" id="blastResult" style="display:none; width:100%">
 				<caption>Blast results for</caption>
-				<tr>
-					<th colspan="2">Nr</th>
-					<th>ID</th>
-					<th>Coverage</th>
-					<th>Description</th>
-					<th>Hsps</th>
-					<th>BitScore</th>
-					<th>E-value</th>
-				</tr>
-				<tbody/>
+                <thead>
+				    <tr>
+					    <th colspan="2">Nr</th>
+					    <th>ID</th>
+					    <th>Coverage</th>
+					    <th>Description</th>
+					    <th>Hsps</th>
+				    	<th>BitScore</th>
+					    <th>E-value</th>
+				    </tr>
+                </thead>
+				<tbody></tbody>
 			</table>
 		</div>
 	</div>

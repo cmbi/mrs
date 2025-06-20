@@ -74,6 +74,7 @@ def create_celery_app(app):  # pragma: no cover
     mrs_config = ElementTree.parse("/usr/local/etc/mrs/mrs-config.xml").getroot()
 
     celery = Celery("MRS")
+    celery.conf.update(app.config)
     celery.conf["result_backend"] = "redis://localhost/0"
     celery.conf["broker_url"] = "amqp://guest:guest@localhost"
     celery.conf["accept_content"] = ["json"]

@@ -99,7 +99,7 @@ sub to_fasta
     my ($self, $text, $db, $id, $title) = @_;
 
     open(my $h, "<", \$text);
-    my ($chainid, %seq);
+    my ($chainid, %seqmap);
 
     while (my $line = <$h>)
     {
@@ -115,18 +115,25 @@ sub to_fasta
         {
             my $seq = uc $1;
 
-            my @seqs = $seq =~ m/[ARNDCQEGHILKMFPSTWYVBZX]+/g;
+            $seq =~ m/[ARNDCQEGHILKMFPSTWYVBZX]+/g;
 
-            $seq{$chainid} = [@seqs];
+            if (defined $seqmap{$chainid})
+            {
+                $seqmap{$chainid} = [@{$seqmap{$chainid}}, $seq];
+            }
+            else
+            {
+                $seqmap{$chainid} = [$seq];
+            }
         }
     }
 
     my $result = '';
-    if (scalar keys %seq)
+    if (scalar keys %seqmap)
     {
-        foreach my $chain (keys %seq)
+        foreach my $chain (keys %seqmap)
         {
-            my @seqs = @{$seq{$chain}};
+            my @seqs = @{$seqmap{$chain}};
             foreach my $seq (@seqs)
             {
                 $result .= ">gnl|$db|$id|$chain $title\n$seq\n";

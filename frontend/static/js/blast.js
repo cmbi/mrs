@@ -486,7 +486,7 @@ BlastResult.prototype.updateResultList2 = function(resultList) {
 		cell.innerHTML =
 			"<a href='link?db=" + escape(hit.db) + "&amp;ix=id&amp;id=" + escape(hit.id) + "' onclick='doStopPropagation(event);'>" +
 			hit.id + "</a>";
-		if (hit.length > 0) {
+		if (hit.length > 0 && hit.chain !== undefined) {
 			cell.innerHTML += '.' + hit.chain;
 		}
 		

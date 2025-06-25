@@ -71,6 +71,7 @@ def blast(query: str, db: str, params: Dict[str, Union[str, float, int, bool]], 
             for hit in hits.findall('Hit'):
 
                 result = {}
+                result["db"] = db
                 result["header"] = hit.find('Hit_def').text
                 id_split = result["header"].split()[0].split('|')
                 result["id"] = id_split[2]

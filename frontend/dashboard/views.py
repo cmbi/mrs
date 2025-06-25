@@ -19,6 +19,36 @@ def index():
     return render_template("index.html")
 
 
+@bp.route("/link", methods=["GET"])
+def link():
+    db = request.args.get('db')
+    id_ = request.args.get('id')
+
+    p = run([current_app.config["mrs_executable"], "entry", "-d", db, "-e", id_],
+            capture_output=True)
+
+    if p.returncode != 0:
+        raise RuntimeError("mrs returned: \n" + p.stderr.decode("utf_8"))
+
+    text = p.stdout.decode("utf_8")
+
+    mrs_directory = None
+    for directory in current_app.config["directories"]:
+        if directory.get("id") == "mrs":
+            mrs_directory = directory.text
+
+    fasta_path = os.path.join(mrs_directory, f"{db}.m6", "fasta")
+
+    fasta = ""
+    if db in current_app.config["databank_parsers"] and current_app.config["databank_parsers"][db] in fasta_parsers:
+
+        parser = fasta_parsers[current_app.config["databank_parsers"][db]]
+        fasta = parser(db, id_, text)
+
+    links = []
+
+    return render_template("entry.html", db=db, q=id_, text=text, fasta=fasta, links=links)
+
 @bp.route("/search", methods=['GET'])
 def search():
     max_results = 5

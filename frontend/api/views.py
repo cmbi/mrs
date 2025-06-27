@@ -11,6 +11,8 @@ from Bio import SeqIO
 
 from flask import Blueprint, render_template, current_app, request, jsonify
 
+from frontend.parse import parse_blast_results, parse_blast_job
+
 
 bp = Blueprint('api', __name__, url_prefix="/api")
 
@@ -22,7 +24,7 @@ def blast_submit() -> str:
 
     from frontend.tasks import blast
 
-    task = blast.s(data["query"], data["db"], data, data["reportLimit"])
+    task = blast.s(data["query"], data["db"], data)
 
     result = task.delay()
 
@@ -40,6 +42,11 @@ def blast_status() -> str:
 
     from frontend.application import celery as celery_app
 
+    blast_directory = None
+    for directory in celery_app.conf["directories"]:
+        if directory.get('id') == "blast":
+            blast_directory = directory.text
+
     statuses = []
     for task_id in task_ids:
 
@@ -50,7 +57,25 @@ def blast_status() -> str:
             "status": result.status.lower(),
         }
 
-        if result.status == "SUCCESS":
+        job_path = os.path.join(blast_directory, f"{task_id}.job")
+        result_xml_path = os.path.join(blast_directory, f"{task_id}.xml")
+        if os.path.isfile(job_path):
+
+            job = parse_blast_job(job_path)
+
+            result.status = "STORED"
+
+            if os.path.isfile(result_xml_path) and result.status != "SUCCESS":
+
+                rs = parse_blast_results(result_xml_path, job['db'], job['query'], job['reportLimit'], job['expect'])
+
+                result.status = "SUCCESS"
+
+                status['hitCount'] = len(rs)
+                status['bestEValue'] = min([r['evalue'] for r in rs])
+
+        elif result.status == "SUCCESS":
+
             rs = result.get()
 
             status['hitCount'] = len(rs)

@@ -1,4 +1,6 @@
 import os
+import logging
+
 from collections import OrderedDict
 from subprocess import run, CalledProcessError
 import traceback
@@ -12,6 +14,9 @@ from Bio import SeqIO
 from flask import Blueprint, render_template, current_app, request, jsonify
 
 from frontend.parse import parse_blast_results, parse_blast_job
+
+
+_log = logging.getLogger(__name__)
 
 
 bp = Blueprint('api', __name__, url_prefix="/api")
@@ -47,49 +52,59 @@ def blast_status() -> str:
         if directory.get('id') == "blast":
             blast_directory = directory.text
 
-    statuses = []
+    responses = []
     for task_id in task_ids:
+
+        _log.debug(f"blast status request for {task_id}")
 
         result = celery_app.AsyncResult(task_id)
 
-        status = {
+        _log.debug(f"got celery result {result.status}")
+
+        response = {
             "id": task_id,
             "status": result.status.lower(),
         }
 
         job_path = os.path.join(blast_directory, f"{task_id}.job")
         result_xml_path = os.path.join(blast_directory, f"{task_id}.xml")
-        if os.path.isfile(job_path):
+        if os.path.isfile(job_path) and result.status != "SUCCESS":
 
             job = parse_blast_job(job_path)
 
-            result.status = "STORED"
+            response["status"] = "stored"
 
-            if os.path.isfile(result_xml_path) and result.status != "SUCCESS":
+            if os.path.isfile(result_xml_path):
 
-                rs = parse_blast_results(result_xml_path, job['db'], job['query'], job['reportLimit'], job['expect'])
+                try:
+                    rs = parse_blast_results(result_xml_path, job['db'], job['query'], job['reportLimit'], job['expect'])
 
-                result.status = "SUCCESS"
+                    response["status"] = "success"
 
-                status['hitCount'] = len(rs)
-                status['bestEValue'] = min([r['evalue'] for r in rs])
+                    response['hitCount'] = len(rs)
+                    response['bestEValue'] = min([r['evalue'] for r in rs])
+
+                except ET.ParseError:
+
+                    # This happens if blast is still in progress.
+                    pass
 
         elif result.status == "SUCCESS":
 
             rs = result.get()
 
-            status['hitCount'] = len(rs)
-            status['bestEValue'] = min([r['evalue'] for r in rs])
+            response['hitCount'] = len(rs)
+            response['bestEValue'] = min([r['evalue'] for r in rs])
 
         elif result.status == "FAILURE":
             try:
                 result.get()
             except Exception as e:
-                status['error'] = str(e)
+                response['error'] = str(e)
 
-        statuses.append(status)
+        responses.append(response)
 
-    return jsonify(statuses)
+    return jsonify(responses)
 
 @bp.route("/blast/result/", methods=['GET'])
 def blast_result() -> str:

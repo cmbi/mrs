@@ -1,3 +1,6 @@
+import logging
+
+import sys
 from xml.etree import ElementTree
 import os
 
@@ -7,6 +10,8 @@ from celery import Celery
 
 
 def create_app():
+
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
     app = Flask("MRS", static_folder='frontend/static', template_folder='frontend/templates')
 

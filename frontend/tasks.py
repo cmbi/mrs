@@ -13,8 +13,8 @@ from frontend.application import celery as celery_app
 from frontend.parse import parse_blast_results
 
 
-@celery_app.task(queue="mrs_blast")
-def blast(query: str, db: str, params: Dict[str, Union[str, float, int, bool]]):
+@celery_app.task(bind=True, queue="mrs_blast")
+def blast(self, query: str, db: str, params: Dict[str, Union[str, float, int, bool]]):
 
     mrs_directory = None
     blast_directory = None
@@ -25,7 +25,7 @@ def blast(query: str, db: str, params: Dict[str, Union[str, float, int, bool]]):
         if directory.get('id') == "blast":
             blast_directory = directory.text
 
-    run_id = params['id']
+    run_id = self.request.id
 
     db_path = os.path.join(mrs_directory, db + ".m6", "blast")
 

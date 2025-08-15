@@ -40,7 +40,7 @@ function toggleClustalWrap() {
 function submitAlignJob() {
 	var form = document.getElementById('alignForm');
 
-	jQuery.post("ajax/align/submit", { input: form.input.value },
+	jQuery.post("api/align/submit", { input: form.input.value },
 		function(result, status) {
 			jQuery('#waiting').hide();
 

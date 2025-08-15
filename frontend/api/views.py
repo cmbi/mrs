@@ -22,6 +22,24 @@ _log = logging.getLogger(__name__)
 bp = Blueprint('api', __name__, url_prefix="/api")
 
 
+@bp.route("/align/submit", methods=['POST'])
+def align_submit() -> str:
+
+    from frontend.tasks import align
+
+    response = {}
+    try:
+        result = align(request.form["input"])
+
+        response["alignment"] = result
+
+    except Exception as e:
+
+        response["error"] = str(e)
+
+    return jsonify(response)
+
+
 @bp.route("/blast/submit", methods=['POST'])
 def blast_submit() -> str:
 

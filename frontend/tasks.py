@@ -13,6 +13,24 @@ from frontend.application import celery as celery_app
 from frontend.parse import parse_blast_results
 
 
+def align(input_: str) -> str:
+
+    job_id = uuid4().hex
+
+    input_path = os.path.join(gettempdir(), f"{job_id}-input.fasta")
+    output_path = os.path.join(gettempdir(), f"{job_id}-output.fasta")
+
+    with open(input_path, 'wt') as input_file:
+        input_file.write(input_)
+
+    cmd = [celery_app.conf["clustalo_executable"], "-i", input_path, "-o", output_path, "--outfmt", "fasta"]
+
+    run(cmd, check=True)
+
+    with open(output_path, 'rt') as output_file:
+        return output_file.read()
+
+
 @celery_app.task(bind=True, queue="mrs_blast")
 def blast(self, query: str, db: str, params: Dict[str, Union[str, float, int, bool]]):
 

@@ -1,39 +1,24 @@
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:mrs="https://mrs.cmbi.umcn.nl/mrs-web/ml"
-	xmlns:z2="http://www.hekkelman.com/libzeep/m2"
-	xml:lang="en" lang="en">
-<head>
-    <title>M6</title>
+{% extends "base.html" %}
+{% block head %}
 
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="author" content="Maarten L. Hekkelman" />
-    <meta name="generator" content="Japi" />
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="static/css/msa.css" />
 
-	<link rel="stylesheet" type="text/css" href="css/mrs-style.css" />
-	<link rel="stylesheet" type="text/css" href="css/msa.css" />
-
-	<script src="scripts/jquery/jquery.js" type="text/javascript">
+	<script src="static/js/msa.js" type="text/javascript">
 	</script>
-	<script src="scripts/mrs.js" type="text/javascript">
-	</script>
-	<script src="scripts/msa.js" type="text/javascript">
-	</script>
-</head>
-<body>
-	<div z2:replace="header :: #header" />
 
+{% endblock %}
+{% block body %}
 	<div id="main">
 		<form id="alignForm" method="POST" action="#" onsubmit="submitAlignJob(); return false;" class="align_form">
 			<fieldset>
 				<p>Enter two or more protein sequences in <em>FastA</em> format</p>
-				<textarea name="input" rows="5" cols="72">${input}</textarea>
+				<textarea name="input" rows="5" cols="72"></textarea>
 				<div><input type="submit" name="Align" value="Align" class="submit" style="float:right;"/></div>
 			</fieldset>
 		</form>
 
-		<div id="waiting" style="display:none;">
-			<img src="images/wait20.gif" />
+		<div id="waiting" style="display:none">
+			<img src="static/images/wait20.gif"/>
 		</div>
 		
 		<div id="result" style="display:none; margin-top: 10px;">
@@ -49,11 +34,10 @@
 					</li>
 				</ul>
 			</div>
-			<div class='msa' id='alignment'>
-				<div id='wrapped' />
-				<div id='unwrapped' style='display:none;' />
+			<div class="msa" id="alignment">
+				<div id="wrapped"/>
+				<div id="unwrapped" style="display:none"/>
 			</div>
 		</div>
 	</div>
-</body>
-</html>
+{% endblock %}

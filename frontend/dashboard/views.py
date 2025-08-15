@@ -140,6 +140,12 @@ def blast():
     return render_template("blast.html", db=db, query=fasta)
 
 
+@bp.route("/align", methods=['GET'])
+def align():
+
+    return render_template("align.html")
+
+
 @bp.errorhandler(Exception)
 def exception_error_handler(error):
     return "<pre>" + traceback.format_exc() + "</pre>"

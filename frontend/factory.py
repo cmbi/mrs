@@ -20,6 +20,7 @@ def create_app():
 
     app.config["mrs_executable"] = "/usr/local/bin/mrs"
     app.config["blastp_executable"] = "/usr/bin/blastp"
+    app.config["clustalo_executable"] = "/usr/bin/clustalo"
 
     mrs_config = ElementTree.parse("/usr/local/etc/mrs/mrs-config.xml").getroot()
 

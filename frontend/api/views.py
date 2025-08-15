@@ -95,7 +95,7 @@ def blast_status() -> str:
             if os.path.isfile(result_xml_path):
 
                 try:
-                    rs = parse_blast_results(result_xml_path, job['db'], job['query'], job['reportLimit'], job['expect'])
+                    rs = parse_blast_results(result_xml_path, job['db'], job['query'], int(job['reportLimit']), float(job['expect']))
 
                     response["status"] = "success"
 
@@ -131,6 +131,21 @@ def blast_result() -> str:
     hit_number = request.args.get('hit')
 
     from frontend.application import celery as celery_app
-    result = celery_app.AsyncResult(task_id)
 
-    return jsonify(result.get())
+    blast_directory = None
+    for directory in celery_app.conf["directories"]:
+        if directory.get('id') == "blast":
+            blast_directory = directory.text
+
+    result_xml_path = os.path.join(blast_directory, f"{task_id}.xml")
+    job_path = os.path.join(blast_directory, f"{task_id}.job")
+
+    if os.path.isfile(result_xml_path) and os.path.isfile(job_path):
+
+        job = parse_blast_job(job_path)
+
+        result = parse_blast_results(result_xml_path, job['db'], job['query'], int(job['reportLimit']), float(job['expect']))
+    else:
+        result = celery_app.AsyncResult(task_id).get()
+
+    return jsonify(result)

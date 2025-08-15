@@ -50,19 +50,6 @@
 
     <div class="wright">
 
-    <div if="${wsdl.length}">
-
-    <h2>SOAP access</h2>
-
-    <p>This MRS server can be accessed using SOAP, the wsdl's are located at:</p>
-    <ul style="list-style-type: none;">
-        <li z2:if="${wsdl['mrsws_search']}"><a z2:href="${wsdl['mrsws_search']}" z2:text="${wsdl['mrsws_search']}"></a></li>
-        <li z2:if="${wsdl['mrsws_blast']}"><a z2:href="${wsdl['mrsws_blast']}" z2:text="${wsdl['mrsws_blast']}"></a></li>
-        <li z2:if="${wsdl['mrsws_align']}"><a z2:href="${wsdl['mrsws_align']}" z2:text="${wsdl['mrsws_align']}"></a></li>
-    </ul>
-
-    </div>
-
     <h2>Open Source</h2>
 
     <p>MRS was designed and implemented by Maarten Hekkelman at the

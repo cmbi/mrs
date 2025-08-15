@@ -1,5 +1,6 @@
 import os
 import logging
+from subprocess import run
 
 from collections import OrderedDict
 from subprocess import run, CalledProcessError
@@ -11,7 +12,7 @@ import xml.etree.ElementTree as ET
 
 from Bio import SeqIO
 
-from flask import Blueprint, render_template, current_app, request, jsonify
+from flask import Blueprint, render_template, request, jsonify
 
 from frontend.parse import parse_blast_results, parse_blast_job
 
@@ -20,6 +21,25 @@ _log = logging.getLogger(__name__)
 
 
 bp = Blueprint('api', __name__, url_prefix="/api")
+
+
+@bp.route("/entry", methods=['GET'])
+def entry() -> str:
+
+    from flask import current_app
+
+    q = request.args.get('q')
+    db = request.args.get('db')
+
+    p = run([current_app.config["mrs_executable"], 'entry', '-d', db, '-e', q],
+             capture_output=True)
+
+    if p.returncode != 0:
+        raise RuntimeError("mrs returned: \n" + p.stderr.decode("utf_8"))
+
+    text = p.stdout.decode("utf_8")
+
+    return text
 
 
 @bp.route("/align/submit", methods=['POST'])

@@ -16,6 +16,8 @@
 #include <numeric>
 #include <cmath>
 
+#include <vector>
+
 #include <boost/bind.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -69,19 +71,20 @@ struct M6Redirect
 M6Server* M6Server::sInstance;
 
 // --------------------------------------------------------------------
-
-class M6TagProcessor : public zh::tag_processor_v1
+/*
+class M6TagProcessor //: public zh::tag_processor_v1
 {
   public:
 	M6TagProcessor(const char* ns)
-		: zh::tag_processor_v1(ns)
+		//: zh::tag_processor_v1(ns)
 	{
 	}
 
 	void process_tag(const std::string& tag, zx::element* node, const el::scope& scope, boost::filesystem::path dir, zh::basic_webapp& webapp)
 	{
 			 if (tag == "link")		process_mrs_link(node, scope, dir, webapp);
-		else zh::tag_processor_v1::process_tag(tag, node, scope, dir, webapp);
+
+		//else zh::tag_processor_v1::process_tag(tag, node, scope, dir, webapp);
 	}
 
 	void process_mrs_link(zx::element *node, const el::scope &scope, boost::filesystem::path dir, zh::basic_webapp& webapp);
@@ -122,7 +125,7 @@ void M6TagProcessor::process_mrs_link(zx::element* node, const el::scope& scope,
         catch (...) {}
     }
 
-    zx::element* a = new zx::element("a");
+    zx::element *a = new zx::element("a");
 
     if (not nr.empty())
         a->set_attribute("href",
@@ -158,10 +161,10 @@ void M6TagProcessor::process_mrs_link(zx::element* node, const el::scope& scope,
     {
         zx::node* clone = c->clone();
         a->push_back(clone);
-		process_xml(clone, scope, dir, webapp);
+		//process_xml(clone, scope, dir, webapp);
     }
 }
-
+*/
 // --------------------------------------------------------------------
 
 M6Server::M6Server(const zx::element* inConfig)
@@ -173,6 +176,7 @@ M6Server::M6Server(const zx::element* inConfig)
 
 	LoadAllDatabanks();
 
+/*
 	LOG(DEBUG,"M6Server: set docroot");
 
 	set_docroot(M6Config::GetDirectory("docroot"));
@@ -230,11 +234,11 @@ M6Server::M6Server(const zx::element* inConfig)
 		mount("ajax/blast/queue", realm->str(), boost::bind(&M6Server::handle_admin_blast_queue_ajax, this, _1, _2, _3));
 		mount("ajax/blast/delete", realm->str(), boost::bind(&M6Server::handle_admin_blast_delete_ajax, this, _1, _2, _3));
 	}
-
+*/
 	LOG(DEBUG,"M6Server: add processors");
 
-	register_tag_processor<zh::tag_processor_v2>(zh::tag_processor_v2::ns());
-	register_tag_processor<M6TagProcessor>(kM6ServerNS);
+	//register_tag_processor<zh::tag_processor_v2>(zh::tag_processor_v2::ns());
+	//register_tag_processor<M6TagProcessor>(kM6ServerNS);
 
 	if (zx::element* e = mConfig->find_first("base-url"))
 	{
@@ -251,6 +255,7 @@ M6Server::M6Server(const zx::element* inConfig)
 		
 	LOG(DEBUG,"M6Server: mounting web services");
 
+/*
 	// web services:
 	for (zx::element* ws : mConfig->find("web-service"))
 	{
@@ -311,7 +316,7 @@ M6Server::M6Server(const zx::element* inConfig)
 			reply.set_content(d->make_wsdl(location));
 		});
 	}
-
+*/
 	LOG(DEBUG,"M6Server: setting instance");
 	
 	if (sInstance && sInstance != this)
@@ -329,8 +334,8 @@ M6Server::~M6Server()
 		delete db.mParser;
 	}
 	
-	for (zeep::dispatcher* ws : mWebServices)
-		delete ws;
+	//for (zeep::dispatcher* ws : mWebServices)
+	//	delete ws;
 
 	delete mConfigCopy;
 
@@ -863,7 +868,7 @@ void M6Server::AddLinks(const string& inDB, const string& inID, el::object& inHi
 
 void M6Server::init_scope(el::scope& scope)
 {
-	webapp::init_scope(scope);
+	//webapp::init_scope(scope);
 
 	if (not mBaseURL.empty())
 		scope.put("baseUrl", el::object(mBaseURL));
@@ -901,6 +906,7 @@ void M6Server::init_scope(el::scope& scope)
 
 // --------------------------------------------------------------------
 
+/*
 void M6Server::handle_request(const zh::request& req, zh::reply& rep)
 {
 	try
@@ -2860,7 +2866,7 @@ void M6Server::create_redirect(const string& databank, uint32 inDocNr,
 		reply = zh::reply::redirect(location);
 	}
 }
-
+*/
 // --------------------------------------------------------------------
 
 void M6Server::SpellCheck(const string& inDatabank, const string& inTerm,
@@ -2901,6 +2907,7 @@ void M6Server::SpellCheck(const string& inDatabank, const string& inTerm,
 // ====================================================================
 // Blast
 
+/*
 void M6Server::handle_blast(const zeep::http::request& request, const el::scope& scope, zeep::http::reply& reply)
 {
 	try
@@ -3763,7 +3770,7 @@ void M6Server::handle_browse(const zh::request& request, const el::scope& scope,
 		throw;
 	}
 }
-
+*/
 // --------------------------------------------------------------------
 
 string M6Server::get_hashed_password(const string& username, const string& realm)
@@ -3828,10 +3835,10 @@ void RunMainLoop(uint32 inNrOfThreads, bool redirectOutputToLog)
 
 		shared_ptr<M6Server> server(new M6Server(config));
 
-		LOG(DEBUG,"RunMainLoop: binding server to %s:%s",addr.c_str(),port.c_str());
+		//LOG(DEBUG,"RunMainLoop: binding server to %s:%s",addr.c_str(),port.c_str());
 	
-		server->bind(addr, boost::lexical_cast<uint16>(port));
-		boost::thread thread(boost::bind(&zeep::http::server::run, boost::ref(*server), inNrOfThreads));
+		//server->bind(addr, boost::lexical_cast<uint16>(port));
+		//boost::thread thread(boost::bind(&zeep::http::server::run, boost::ref(*server), inNrOfThreads));
 	
 		cerr << " done" << endl
 			 << local_date_time(second_clock::local_time(), time_zone_ptr())
@@ -3866,10 +3873,9 @@ void RunMainLoop(uint32 inNrOfThreads, bool redirectOutputToLog)
 		}
 		while (sig == SIGCHLD); // we don't care about these in MRS server
 
-		server->stop();
-
-		LOG(DEBUG,"RunMainLoop: stopped server");
-
+		//server->stop();
+		//LOG(DEBUG,"RunMainLoop: stopped server");
+/*
 #ifdef BOOST_CHRONO_EXTENSIONS
 		if (not thread.try_join_for(boost::chrono::seconds(5)))
 #else
@@ -3879,7 +3885,7 @@ void RunMainLoop(uint32 inNrOfThreads, bool redirectOutputToLog)
 			thread.interrupt();
 			thread.detach();
 		}
-
+*/
 		LOG(DEBUG,"RunMainLoop: ending iteration");
 	
 		if (sig == SIGHUP)

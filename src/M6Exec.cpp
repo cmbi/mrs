@@ -82,7 +82,7 @@ double system_time()
 
 #if defined(_MSC_VER)
 
-int ForkExec(vector<const char*>& args, double maxRunTime, istream& in, ostream& out, ostream& err)
+/*int ForkExec(vector<const char*>& args, double maxRunTime, istream& in, ostream& out, ostream& err)
 {
 	if (args.empty() or args.front() == nullptr)
 		THROW(("No arguments to ForkExec"));
@@ -246,6 +246,7 @@ int ForkExec(vector<const char*>& args, double maxRunTime, istream& in, ostream&
 
 	return 0;
 }
+*/
 
 struct M6ProcessImpl
 {
@@ -407,7 +408,7 @@ streamsize M6ProcessImpl::read(char* s, streamsize n)
 }
 
 #else
-
+/*
 int ForkExec(vector<const char*>& args, double maxRunTime, istream& stdin, ostream& stdout, ostream& stderr)
 {
 	if (args.empty() or args.front() == nullptr)
@@ -606,6 +607,7 @@ int ForkExec(vector<const char*>& args, double maxRunTime, istream& stdin, ostre
 	
 	return result;
 }
+*/
 
 struct M6ProcessImpl
 {

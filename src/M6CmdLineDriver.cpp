@@ -27,7 +27,6 @@
 #include "M6Fetch.h"
 #include "M6MD5.h"
 #include "M6Utilities.h"
-#include "M6Server.h"
 
 #if defined _MSC_VER
 #define WIN32_LEAN_AND_MEAN   
@@ -193,17 +192,6 @@ class M6PasswordDriver : public M6CmdLineDriver
 {
   public:
                    M6PasswordDriver() {};
-
-   virtual void    AddOptions(po::options_description& desc,
-                       unique_ptr<po::positional_options_description>& p);
-   virtual bool    Validate(po::variables_map& vm);
-   virtual int     Exec(const string& inCommand, po::variables_map& vm);
-};
-
-class M6ServerDriver : public M6CmdLineDriver
-{
-  public:
-                   M6ServerDriver() {};
 
    virtual void    AddOptions(po::options_description& desc,
                        unique_ptr<po::positional_options_description>& p);
@@ -399,6 +387,8 @@ bool M6VersionDriver::Validate(po::variables_map& vm)
 int M6VersionDriver::Exec(const string& inCommand, po::variables_map& vm)
 {
 	cout << MRS_CURRENT_VERSION << endl ;
+
+    return 0;
 }
 
 // --------------------------------------------------------------------
@@ -491,7 +481,7 @@ int M6BlastDriver::Exec(const string& inCommand, po::variables_map& vm)
     {
         // Determine the number of threads from config:
         const zx::element *server = M6Config::GetServer(),
-                          *blaster = server->find_first("blaster");
+                        *blaster = server->find_first("blaster");
         if (blaster != nullptr)
         {
             uint32 n =  boost::lexical_cast<uint32> (blaster->get_attribute ("nthread"));
@@ -973,64 +963,6 @@ int M6PasswordDriver::Exec(const string& inCommand, po::variables_map& vm)
 }
 
 // --------------------------------------------------------------------
-//	Server
-
-void M6ServerDriver::AddOptions(po::options_description& desc,
-						unique_ptr<po::positional_options_description>& p)
-{
-	desc.add_options()
-		("config,c",	po::value<string>(),	"Configuration file")
-		("user,u",		po::value<string>(),	"User to run as (e.g. nobody)")
-		("pidfile,p",	po::value<string>(),	"Create file with process ID (pid)")
-		("no-daemon,F",							"Do not run as background process")
-		("command",		po::value<string>(),	"Command, one of start, stop, status or reload")
-		("help,h",								"Display help message")
-		;
-
-	p.reset(new po::positional_options_description());
-	p->add("command", 1);
-}
-
-bool M6ServerDriver::Validate(po::variables_map& vm)
-{
-	LoadConfig(vm);
-	return vm.count("command") > 0;
-}
-
-int M6ServerDriver::Exec(const string& inCommand, po::variables_map& vm)
-{
-	string command = vm["command"].as<string>();
-	
-	string user;
-	if (vm.count("user"))
-		user = vm["user"].as<string>();
-	
-	string pidfile;
-	if (vm.count("pidfile"))
-		pidfile = vm["pidfile"].as<string>();
-	
-	int result;
-
-	bool foreground = vm.count("no-daemon") > 0;
-#if defined(_MSC_VER)
-	foreground = true;
-#endif
-
-	if (command == "start")
-		result = M6Server::Start(user, pidfile, foreground);
-	else if (command == "stop")
-		result = M6Server::Stop(pidfile);
-	else if (command == "status")
-		result = M6Server::Status(pidfile);
-	else if (command == "reload")
-		result = M6Server::Reload(pidfile);
-	else
-		THROW(("Invalid command '%s'", command.c_str()));
-	
-	return result;
-}
-
-// --------------------------------------------------------------------
 //	main
 
 int main(int argc, char* argv[])
@@ -1062,7 +994,6 @@ int main(int argc, char* argv[])
 		M6CmdLineDriver::Register<M6FetchDriver>	("fetch",	"Fetch/mirror remote data for a databank");
 		M6CmdLineDriver::Register<M6InfoDriver>		("info",	"Display information and statistics for a databank");
 		M6CmdLineDriver::Register<M6QueryDriver>	("query",	"Perform a search in a databank");
-		M6CmdLineDriver::Register<M6ServerDriver>	("server",	"Start or Stop a server session, or query the status");
 		M6CmdLineDriver::Register<M6VacuumDriver>	("vacuum",	"Clean up a databank reclaiming unused disk space");
 		M6CmdLineDriver::Register<M6ValidateDriver>	("validate","Perform a set of validation tests");
 		M6CmdLineDriver::Register<M6BuildDriver>	("update",	"Same as build, but does a fetch first");

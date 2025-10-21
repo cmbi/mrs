@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <list>
 #include <vector>
 #include <algorithm>
 #include <tuple>

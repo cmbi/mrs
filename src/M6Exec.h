@@ -12,8 +12,8 @@
 #include <boost/iostreams/categories.hpp>
 #include <boost/iostreams/read.hpp>
 
-int ForkExec(std::vector<const char*>& args, double maxRunTime,
-	std::istream& in, std::ostream& out, std::ostream& err);
+//int ForkExec(std::vector<const char*>& args, double maxRunTime,
+//	std::istream& in, std::ostream& out, std::ostream& err);
 
 class M6Process : public boost::iostreams::source
 {

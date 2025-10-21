@@ -14,6 +14,7 @@
 #include "boost/date_time/posix_time/posix_time.hpp"
 #include "boost/date_time/local_time/local_time.hpp"
 #include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/directory.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
@@ -938,14 +939,15 @@ void M6Scheduler::Run()
 
 				LOG(DEBUG,"fork executing %s %s %s",exe.c_str(),action.c_str(),databank.c_str());
 	
+            /*
 				stringstream in;
 				int r = ForkExec(args, 0, in, *mLogFile, *mLogFile);
 				
 				if (r == 0)
 					reload = true;	// signal to reload databanks
 				else
-					*mLogFile << action << " of " << databank << " returned: " << r << endl;
-				
+				*mLogFile << action << " of " << databank << " returned: " << r << endl;
+			*/
 				*mLogFile << endl;
 			}
 		}

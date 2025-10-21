@@ -17,10 +17,8 @@
 #include "M6Databank.h"
 
 #include "M6WSBlast.h"
-#include "M6Server.h"
 
 using namespace std;
-namespace zx = zeep::xml;
 namespace ba = boost::algorithm;
 namespace fs = boost::filesystem;
 
@@ -67,8 +65,7 @@ Parameters::Parameters(boost::optional<Parameters>& rhs)
 // 
 
 M6WSBlast::M6WSBlast(M6Server& inServer, const string& inNS, const string& inService)
-	: zeep::dispatcher(inNS, inService)
-	, mServer(inServer)
+	mServer(inServer)
 {
 	using namespace M6WSBlastNS;
 	
@@ -82,11 +79,6 @@ M6WSBlast::M6WSBlast(M6Server& inServer, const string& inNS, const string& inSer
 	SOAP_XML_ADD_ENUM(JobStatus, running);
 	SOAP_XML_ADD_ENUM(JobStatus, error);
 	SOAP_XML_ADD_ENUM(JobStatus, finished);
-
-	register_action("Blast", this, &M6WSBlast::Blast, {"query", "program", "db", "params", "reportLimit", "jobId"});
-	register_action("BlastJobStatus", this, &M6WSBlast::BlastJobStatus, {"jobId", "status"});
-	register_action("BlastJobResult", this, &M6WSBlast::BlastJobResult, {"jobId", "result"});
-	register_action("BlastJobError", this, &M6WSBlast::BlastJobError, {"jobId", "error"});
 }
 
 M6WSBlast::~M6WSBlast()

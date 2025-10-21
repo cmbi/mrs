@@ -14,14 +14,15 @@
 #include <boost/thread/mutex.hpp>
 
 #include <zeep/http/webapp.hpp>
-#include <zeep/el/element.hpp>
+//#include <zeep/el/element.hpp>
+#include <zeep/http/webapp/el.hpp>
 #include <zeep/dispatcher.hpp>
 
 #include "M6Config.h"
 
 namespace zh = zeep::http;
 namespace zx = zeep::xml;
-namespace el = zeep::el;
+namespace el = zeep::http::el;
 
 class M6Iterator;
 class M6Databank;
@@ -31,7 +32,7 @@ class M6WSBlast;
 
 typedef std::map<std::string,std::set<M6Databank*>> M6LinkMap;
 
-class M6Server : public zh::webapp
+class M6Server// : public zh::webapp
 {
   public:
 					M6Server(const zx::element* inConfig);
@@ -46,7 +47,7 @@ class M6Server : public zh::webapp
 	static int		Status(const std::string& inPidFile);
 	static int		Reload(const std::string& inPidFile);
 
-	virtual void	handle_request(const zh::request& req, zh::reply& rep);
+	//virtual void	handle_request(const zh::request& req, zh::reply& rep);
 
 	void			LoadAllDatabanks();
 	M6Databank*		Load(const std::string& inDatabank);
@@ -102,7 +103,7 @@ class M6Server : public zh::webapp
 	virtual std::string
 					get_hashed_password(const std::string& username, const std::string& realm);
 	void			ProcessNewConfig(const std::string& inPage, const zh::request& request);
-
+/*
 	void			handle_download(const zh::request& request, const el::scope& scope, zh::reply& reply);
 	void			handle_entry(const zh::request& request, const el::scope& scope, zh::reply& reply);
 	void			handle_file(const zh::request& request, const el::scope& scope, zh::reply& reply);
@@ -148,7 +149,7 @@ class M6Server : public zh::webapp
 	void			highlight_query_terms(zx::element* node, boost::regex& expr);
 	void			create_link_tags(zx::element* node, boost::regex& expr, const std::string& inDatabank,
 						const std::string& inIndex, const std::string& inID, const std::string& inAnchor);
-
+*/
 	void			SpellCheck(const std::string& inDatabank, const std::string& inTerm,
 						std::vector<std::pair<std::string,uint16>>& outCorrections);
 
@@ -167,6 +168,6 @@ class M6Server : public zh::webapp
 
 	M6Config::File*	mConfigCopy;
 	
-	std::vector<zeep::dispatcher*>
-					mWebServices;
+//	std::vector<zeep::dispatcher*>
+//					mWebServices;
 };

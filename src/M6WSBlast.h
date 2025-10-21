@@ -5,11 +5,8 @@
 
 #pragma once
 
-#include <zeep/dispatcher.hpp>
 #include <boost/shared_ptr.hpp>
 #include <list>
-
-#include <zeep/xml/node.hpp>
 
 class M6Server;
 
@@ -126,7 +123,7 @@ struct BlastResult
 
 }
 
-class M6WSBlast : public zeep::dispatcher
+class M6WSBlast
 {
   public:
 				M6WSBlast(M6Server& inServer, const std::string& inNS, const std::string& inService);
@@ -139,7 +136,4 @@ class M6WSBlast : public zeep::dispatcher
 	void		BlastJobStatus(std::string jobId, M6WSBlastNS::JobStatus& status);
 	void		BlastJobResult(std::string jobId, M6WSBlastNS::BlastResult& result);
 	void		BlastJobError(std::string jobId, std::string& error);
-	
-  protected:
-	M6Server&	mServer;
 };

@@ -29,6 +29,7 @@ typedef socklen_t M6SockLen;
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/filesystem/directory.hpp>
 #include <boost/regex.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
@@ -620,7 +621,7 @@ void M6FTPFetcherImpl::ListFiles(const string& inPattern,
 
 void M6FTPFetcherImpl::FetchFile(fs::path inRemote, fs::path inLocal, time_t inTime, M6Progress& inProgress)
 {
-	fs::path local(inLocal.branch_path() / (inLocal.filename().string() + ".tmp"));
+	fs::path local(inLocal.parent_path() / (inLocal.filename().string() + ".tmp"));
 	
 	if (fs::exists(local))
 		fs::remove(local);
@@ -802,11 +803,13 @@ void M6RSyncFetcherImpl::Mirror(bool inDryRun, ostream& out)
             cout << arg << ' ';
 	cout << endl;
 
+/*
 	stringstream in;
 	int r = ForkExec(args, 0, in, cout, cerr);
 	
 	if (r != 0)
 		THROW(("Failed to rsync %s", databank.c_str()));
+*/
 }
 
 // --------------------------------------------------------------------

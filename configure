@@ -326,7 +326,7 @@ END
 
 	if (not CheckLib("zeep", $header_check, $lib_check))
 	{
-		die "libzeep is not installed, either install the package libzeep-dev\n",
+		die "libzeep 4.0 is not installed, either install the package libzeep-4.0\n",
 			"or download libzeep from ftp://ftp.cmbi.ru.nl/pub/software/libzeep\n",
 			"and run configure again.\n";
 	}

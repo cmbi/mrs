@@ -20,6 +20,7 @@ ENV BOOST_ROOT /deps/boost_1_65_1
 # Install libzeep
 RUN git clone https://github.com/mhekkel/libzeep.git /deps/libzeep
 WORKDIR /deps/libzeep
+RUN git checkout tags/v4.0.0
 RUN make -j ; make install ; ldconfig
 
 WORKDIR /app

@@ -89,6 +89,7 @@ You need to have the following to build MRS from source code:
 - gcc 4.6
 - libboost >= 1.65
 - libperl-dev			Development files for Perl
+- libzeep == 4.0.0
 
 Then run:
 

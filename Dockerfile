@@ -11,7 +11,7 @@ RUN mkdir -p /deps
 
 # Install boost 1.65
 WORKDIR /deps/
-RUN wget https://dl.bintray.com/boostorg/release/1.65.1/source/boost_1_65_1.tar.bz2 && tar xjf boost_1_65_1.tar.bz2 && rm boost_1_65_1.tar.bz2
+RUN wget https://archives.boost.io/release/1.65.1/source/boost_1_65_1.tar.bz2 && tar xjf boost_1_65_1.tar.bz2 && rm boost_1_65_1.tar.bz2
 WORKDIR /deps/boost_1_65_1
 RUN ./bootstrap.sh && ./b2 install && ldconfig
 RUN install bjam /usr/local/bin/bjam

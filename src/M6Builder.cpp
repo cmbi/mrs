@@ -659,7 +659,7 @@ void M6Builder::Build(uint32 inNrOfThreads)
 {
 	string dbID = mConfig->get_attribute("id");
 
-	LOG(DEBUG,"building %s in %d threads",dbID.c_str(),inNrOfThreads);
+	LOG(DEBUG_,"building %s in %d threads",dbID.c_str(),inNrOfThreads);
 	
 //	boost::timer::auto_cpu_timer t;
 
@@ -801,7 +801,7 @@ void M6Scheduler::Schedule(const string& inDatabank, const char* inAction)
 	if (find_if(mScheduled.begin(), mScheduled.end(), [inDatabank](tuple<string,string>& s) -> bool
 			{ return get<0>(s) == inDatabank; }) == mScheduled.end())
 	{
-		LOG(DEBUG,"scheduling update for %s",inDatabank.c_str());
+		LOG(DEBUG_,"scheduling update for %s",inDatabank.c_str());
 
 		mScheduled.push_back(make_tuple(inDatabank, inAction));
 	}
@@ -936,7 +936,7 @@ void M6Scheduler::Run()
 				
 				*mLogFile << "About to " << action << ' ' << databank << endl;
 
-				LOG(DEBUG,"fork executing %s %s %s",exe.c_str(),action.c_str(),databank.c_str());
+				LOG(DEBUG_,"fork executing %s %s %s",exe.c_str(),action.c_str(),databank.c_str());
 	
 				stringstream in;
 				int r = ForkExec(args, 0, in, *mLogFile, *mLogFile);

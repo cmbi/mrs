@@ -22,7 +22,7 @@ enum M6LogLevel
   WARN,   // Not an error, but indicates error will occurr if nothing done.
   NOTICE, // Events that are unusual, but not error conditions.
   INFO,   // Normal operational messages. No action required.
-  DEBUG,  // Information useful during development for debugging.
+  DEBUG_, // Information useful during development for debugging.
   NOTSET
 };
 

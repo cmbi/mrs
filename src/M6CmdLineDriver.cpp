@@ -398,7 +398,8 @@ bool M6VersionDriver::Validate(po::variables_map& vm)
 
 int M6VersionDriver::Exec(const string& inCommand, po::variables_map& vm)
 {
-	cout << MRS_CURRENT_VERSION << endl ;
+	cout << MRS_CURRENT_VERSION << endl;
+	return 0;
 }
 
 // --------------------------------------------------------------------

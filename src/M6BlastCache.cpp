@@ -83,7 +83,7 @@ M6BlastCache& M6BlastCache::Instance()
 
 M6BlastCache::M6BlastCache()
 {
-	LOG(DEBUG,"Creating M6BlastCache");
+	LOG(DEBUG_,"Creating M6BlastCache");
 
 	string s = M6Config::GetDirectory("blast");
 	if (s.empty())
@@ -151,7 +151,7 @@ M6BlastCache::M6BlastCache()
 	mWorkerThread = boost::thread([this](){ this->Work(); });
     mHighLoadThread = boost::thread([this](){ this->Work (true); });
 
-	LOG(DEBUG,"M6BlastCache has been created");
+	LOG(DEBUG_,"M6BlastCache has been created");
 }
 
 M6BlastCache::~M6BlastCache()
@@ -191,14 +191,14 @@ tuple<M6BlastJobStatus,string,uint32,double> M6BlastCache::JobStatus(const strin
 
 	get<0>(result) = bj_Unknown;
 
-	LOG(DEBUG,"M6BlastCache::JobStatus: looking up job %s in cache",inJobID.c_str());
+	LOG(DEBUG_,"M6BlastCache::JobStatus: looking up job %s in cache",inJobID.c_str());
 
 	auto i = find_if(mResultCache.begin(), mResultCache.end(), [&inJobID](CacheEntry& e) -> bool
 				{ return e.id == inJobID; });
 	
 	if (i != mResultCache.end()) // is requested job id in list ?
 	{
-		LOG(DEBUG,"M6BlastCache::JobStatus: matched job %s with status %s",inJobID.c_str(),StatusToString(i->status).c_str());
+		LOG(DEBUG_,"M6BlastCache::JobStatus: matched job %s with status %s",inJobID.c_str(),StatusToString(i->status).c_str());
 
 		get<0>(result) = i->status;
 		
@@ -246,7 +246,7 @@ tuple<M6BlastJobStatus,string,uint32,double> M6BlastCache::JobStatus(const strin
 			mResultCache.splice(mResultCache.begin(), mResultCache, i, j);
 	}
 	
-	LOG(DEBUG,"M6BlastCache::JobStatus: returning status %s for job %s",StatusToString(i->status).c_str(),inJobID.c_str());
+	LOG(DEBUG_,"M6BlastCache::JobStatus: returning status %s for job %s",StatusToString(i->status).c_str(),inJobID.c_str());
 
 	return result;
 }
@@ -300,7 +300,7 @@ void M6BlastCache::CacheResult(const string& inJobID, M6BlastResultPtr inResult)
 		zeep::xml::document doc;
 		doc.serialize("blast-result", *inResult);
 
-		LOG(DEBUG,"Storing result of blast job with id: %s",inJobID.c_str());
+		LOG(DEBUG_,"Storing result of blast job with id: %s",inJobID.c_str());
 	
 		fs::ofstream file(mCacheDir / (inJobID + ".xml.bz2"), ios_base::out|ios_base::trunc|ios_base::binary);
 		io::filtering_stream<io::output> out;
@@ -360,7 +360,7 @@ string M6BlastCache::Submit(const string& inDatabank, const string& inQuery,
 	bool inGapped, int32 inGapOpen, int32 inGapExtend,
 	uint32 inReportLimit)
 {
-	LOG(DEBUG,"M6BlastCache::Submit call with query length %d and databank %s",inQuery.size(),inDatabank.c_str());
+	LOG(DEBUG_,"M6BlastCache::Submit call with query length %d and databank %s",inQuery.size(),inDatabank.c_str());
 
 	if (inReportLimit > 1000)
 		THROW(("Report limit exceeds maximum of 1000 hits"));
@@ -403,7 +403,7 @@ string M6BlastCache::Submit(const string& inDatabank, const string& inQuery,
             }
 		}
 
-		LOG(DEBUG,"M6BlastCache::Submit: returning existing blast job id: %s",result.c_str());
+		LOG(DEBUG_,"M6BlastCache::Submit: returning existing blast job id: %s",result.c_str());
 
 		break;
 	}
@@ -443,7 +443,7 @@ string M6BlastCache::Submit(const string& inDatabank, const string& inQuery,
 
 		result = e.id;
 
-		LOG(DEBUG,"M6BlastCache::Submit: returning newly created blast job id: %s",result.c_str());
+		LOG(DEBUG_,"M6BlastCache::Submit: returning newly created blast job id: %s",result.c_str());
 	}
 
 	return result;
@@ -579,7 +579,7 @@ void M6BlastCache::ExecuteJob(const string& inJobID, const uint32 n_threads)
 	}
 	catch (exception& e)
 	{
-		LOG(DEBUG,"M6BlastCache::ExecuteJob: exception thrown for job %s: %s",inJobID.c_str(),e.what());
+		LOG(DEBUG_,"M6BlastCache::ExecuteJob: exception thrown for job %s: %s",inJobID.c_str(),e.what());
 
 		SetJobStatus(inJobID, bj_Error);
 

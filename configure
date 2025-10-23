@@ -261,7 +261,7 @@ END
 	print " OK\n";
 	
 	# set the C++0x flag
-	$cxxflags .= " -std=c++0x" unless $cxxflags and $cxxflags =~ m/-std=c\+\+0x/;
+	# $cxxflags .= " -std=c++0x" unless $cxxflags and $cxxflags =~ m/-std=c\+\+0x/;
 	$cxxflags .= " -pthread" unless $cxxflags =~ m/-pthread/;
 	
 	# check the required libraries
@@ -300,8 +300,8 @@ END
 	# zeep libraries
 	if ($zeep)
 	{
-		$inc_dirs{"$zeep"} = 1;
-		$lib_dirs{"$zeep"} = 1;
+		$inc_dirs{"$zeep/include"} = 1;
+		$lib_dirs{"$zeep/lib"} = 1;
 	}
 
 	

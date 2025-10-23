@@ -423,7 +423,7 @@ int ForkExec(vector<const char*>& args, double maxRunTime, istream& stdin, ostre
     for (auto arg = args.begin(); arg != args.end() and *arg != nullptr; ++arg)
         cmd = cmd + " " + *arg;
 
-    LOG(DEBUG, "called ForkExec with \"" + cmd + "\"");
+    LOG(DEBUG_, "called ForkExec with \"" + cmd + "\"");
 
 
 	// ready to roll
@@ -442,30 +442,30 @@ int ForkExec(vector<const char*>& args, double maxRunTime, istream& stdin, ostre
 		ioService->notify_fork(boost::asio::io_service::fork_prepare);
 	}
 	
-    LOG(DEBUG, "ExecFork forks");
+    LOG(DEBUG_, "ExecFork forks");
 
 	int pid = fork();
 	
 	if (pid == 0)	// the child
 	{
-        LOG(DEBUG, "ExecFork child");
+        LOG(DEBUG_, "ExecFork child");
 
 		if (ioService != nullptr)
 		{
-            LOG(DEBUG, "ExecFork has ioService");
+            LOG(DEBUG_, "ExecFork has ioService");
 
 			ioService->notify_fork(boost::asio::io_service::fork_child);
 		}
 
-        LOG(DEBUG, "ExecFork setpgid");
+        LOG(DEBUG_, "ExecFork setpgid");
 		
 		setpgid(0, 0);		// detach from the process group, create new
 
-        LOG(DEBUG, "ExecFork signal");
+        LOG(DEBUG_, "ExecFork signal");
 
 		signal(SIGCHLD, SIG_IGN);	// block child died signals
 
-        LOG(DEBUG, "ExecFork files");
+        LOG(DEBUG_, "ExecFork files");
 
 		dup2(ifd[0], STDIN_FILENO);
 		close(ifd[0]);
@@ -479,7 +479,7 @@ int ForkExec(vector<const char*>& args, double maxRunTime, istream& stdin, ostre
 		close(efd[0]);
 		close(efd[1]);
 
-        LOG(DEBUG, "execve \"" + cmd + "\"");
+        LOG(DEBUG_, "execve \"" + cmd + "\"");
 
 		const char* env[] = { nullptr };
 		(void)execve(args.front(), const_cast<char* const*>(&args[0]), const_cast<char* const*>(env));

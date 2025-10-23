@@ -169,19 +169,19 @@ M6Server::M6Server(const zx::element* inConfig)
 	, mAlignEnabled(false)
 	, mConfigCopy(nullptr)
 {
-	LOG(DEBUG,"M6Server: load databanks");
+	LOG(DEBUG_,"M6Server: load databanks");
 
 	LoadAllDatabanks();
 
-	LOG(DEBUG,"M6Server: set docroot");
+	LOG(DEBUG_,"M6Server: set docroot");
 
 	set_docroot(M6Config::GetDirectory("docroot"));
 
-	LOG(DEBUG,"M6Server: set log forwarded");
+	LOG(DEBUG_,"M6Server: set log forwarded");
 
 	log_forwarded(mConfig->get_attribute("log-forwarded") == "true");
 	
-	LOG(DEBUG,"M6Server: mounting pages");
+	LOG(DEBUG_,"M6Server: mounting pages");
 
 	mount("",				boost::bind(&M6Server::handle_welcome, this, _1, _2, _3));
 	mount("download",		boost::bind(&M6Server::handle_download, this, _1, _2, _3));
@@ -231,7 +231,7 @@ M6Server::M6Server(const zx::element* inConfig)
 		mount("ajax/blast/delete", realm->str(), boost::bind(&M6Server::handle_admin_blast_delete_ajax, this, _1, _2, _3));
 	}
 
-	LOG(DEBUG,"M6Server: add processors");
+	LOG(DEBUG_,"M6Server: add processors");
 
 	register_tag_processor<zh::tag_processor_v2>(zh::tag_processor_v2::ns());
 	register_tag_processor<M6TagProcessor>(kM6ServerNS);
@@ -243,13 +243,13 @@ M6Server::M6Server(const zx::element* inConfig)
 			mBaseURL += '/';
 	}
 
-	LOG(DEBUG,"M6Server: getting clustal");
+	LOG(DEBUG_,"M6Server: getting clustal");
 
 	fs::path clustalo(M6Config::GetTool("clustalo"));
 	if (fs::exists(clustalo))
 		mAlignEnabled = true;
 		
-	LOG(DEBUG,"M6Server: mounting web services");
+	LOG(DEBUG_,"M6Server: mounting web services");
 
 	// web services:
 	for (zx::element* ws : mConfig->find("web-service"))
@@ -312,13 +312,13 @@ M6Server::M6Server(const zx::element* inConfig)
 		});
 	}
 
-	LOG(DEBUG,"M6Server: setting instance");
+	LOG(DEBUG_,"M6Server: setting instance");
 	
 	if (sInstance && sInstance != this)
 		delete sInstance;
 	sInstance = this;
 
-	LOG(DEBUG,"M6Server: done");
+	LOG(DEBUG_,"M6Server: done");
 }
 
 M6Server::~M6Server()
@@ -746,7 +746,7 @@ vector<string> M6Server::UnAlias(const string& inDatabank)
 {
 	vector<string> result;
 	
-	LOG (DEBUG, "attempting to resolve alias %s", inDatabank.c_str ());
+	LOG (DEBUG_, "attempting to resolve alias %s", inDatabank.c_str ());
 
 	for (auto& db : mLoadedDatabanks)
 	{
@@ -757,7 +757,7 @@ vector<string> M6Server::UnAlias(const string& inDatabank)
 	sort(result.begin(), result.end());
 	result.erase(unique(result.begin(), result.end()), result.end());
 	
-	LOG (DEBUG, "found %d databanks for alias %s", result.size (),
+	LOG (DEBUG_, "found %d databanks for alias %s", result.size (),
 												   inDatabank.c_str ());
 
 	return result;
@@ -907,7 +907,7 @@ void M6Server::handle_request(const zh::request& req, zh::reply& rep)
 	{
 		zh::webapp::handle_request(req, rep);
 
-		LOG(DEBUG,"M6Server: completed %s request handling for %s", zh::to_string(req.method), req.uri.c_str());
+		LOG(DEBUG_,"M6Server: completed %s request handling for %s", zh::to_string(req.method), req.uri.c_str());
 	}
 	catch (zh::status_type& s)
 	{
@@ -955,7 +955,7 @@ void M6Server::handle_welcome(const zh::request& request, const el::scope& scope
 
 	create_reply_from_template("index.html", sub, reply);
 
-		LOG(DEBUG,"done generating welcome page response");
+		LOG(DEBUG_,"done generating welcome page response");
 }
 	catch(...)
 	{
@@ -2553,11 +2553,11 @@ void M6Server::handle_admin_blast_queue_ajax(const zh::request& request,
 	{
 		el::object jobs = el::object::value_type::array;
 
-		LOG(DEBUG, "M6Server: listing blast jobs for an admin request");
+		LOG(DEBUG_, "M6Server: listing blast jobs for an admin request");
 
 	for (const M6BlastJobDesc& jobDesc : M6BlastCache::Instance().GetJobList())
 	{
-			LOG(DEBUG, "M6Server: iter job %s", jobDesc.id.c_str());
+			LOG(DEBUG_, "M6Server: iter job %s", jobDesc.id.c_str());
 
 			jobs.push_back({
 				{ "id", jobDesc.id },
@@ -2567,7 +2567,7 @@ void M6Server::handle_admin_blast_queue_ajax(const zh::request& request,
 			});
 		}
 
-		LOG(DEBUG, "M6Server: returning blast jobs for an admin request");
+		LOG(DEBUG_, "M6Server: returning blast jobs for an admin request");
 
 		reply.set_content(jobs);
 	}
@@ -3152,6 +3152,7 @@ void M6Server::handle_blast_results_ajax(const zeep::http::request& request, con
 ostream& operator<<(ostream& os, M6BlastJobStatus status)
 {
     os << StatusToString(status);
+	return os;
 }
 
 void M6Server::handle_blast_status_ajax(const zeep::http::request& request, const el::scope& scope, zeep::http::reply& reply)
@@ -3161,7 +3162,7 @@ void M6Server::handle_blast_status_ajax(const zeep::http::request& request, cons
 		string ids = request.get_parameter("jobs");
 		vector<string> jobs;
 
-		LOG (DEBUG, "handle_blast_status_ajax for jobs string of length %d", ids.size ());
+		LOG (DEBUG_, "handle_blast_status_ajax for jobs string of length %d", ids.size ());
 	
 	if (not ids.empty())
 		ba::split(jobs, ids, ba::is_any_of(";"));
@@ -3316,7 +3317,7 @@ void M6Server::handle_blast_submit_ajax(
 			boost::lexical_cast<double>(expect), filter,
 			gapped, gapOpen, gapExtend, reportLimit);
 	
-			LOG (DEBUG, "handle_blast_submit_ajax: created new job with id: %s", jobId.c_str ());
+			LOG (DEBUG_, "handle_blast_submit_ajax: created new job with id: %s", jobId.c_str ());
 
 		// and answer with the created job ID
 		result["id"] = jobId;
@@ -3588,7 +3589,7 @@ void M6Server::handle_info(const zh::request& request, const el::scope& scope, z
 		    THROW(("No databank specified"));
 		}
 
-		LOG (DEBUG, "M6Server: info request is for databank %s", dbAlias.c_str ());
+		LOG (DEBUG_, "M6Server: info request is for databank %s", dbAlias.c_str ());
 
 	    vector<string> aliased = UnAlias(dbAlias);
 		bool bAlias = aliased.size() > 1 ||
@@ -3597,7 +3598,7 @@ void M6Server::handle_info(const zh::request& request, const el::scope& scope, z
 	vector<el::object> databanks;
 	for (string db : aliased)
 	{
-			LOG (DEBUG, "M6Server: Resolved %s to %s", dbAlias.c_str (), db.c_str ());
+			LOG (DEBUG_, "M6Server: Resolved %s to %s", dbAlias.c_str (), db.c_str ());
 
 	for (M6LoadedDatabank& ldb : mLoadedDatabanks)
 	{
@@ -3659,7 +3660,7 @@ void M6Server::handle_info(const zh::request& request, const el::scope& scope, z
 	}
 	}
 	
-		LOG (DEBUG, "M6Server: creating info reply for %d databanks",
+		LOG (DEBUG_, "M6Server: creating info reply for %d databanks",
 					aliased.size ());
 
 	if(bAlias) {
@@ -3744,7 +3745,7 @@ void M6Server::handle_browse(const zh::request& request, const el::scope& scope,
 		mdb->ListIndexEntries(ix, iFirst, iLast, keys);
 
         for (auto& key : keys)
-            LOG (DEBUG, "key for %s - %s: %s", iFirst.c_str (), iLast.c_str (), key.c_str ());
+            LOG (DEBUG_, "key for %s - %s: %s", iFirst.c_str (), iLast.c_str (), key.c_str ());
 
 		sub.put("keys", keys.begin(), keys.end());
 	}
@@ -3789,7 +3790,7 @@ void RunMainLoop(uint32 inNrOfThreads, bool redirectOutputToLog)
 		{
 		if (redirectOutputToLog)
 		{
-			LOG(DEBUG,"RunMainLoop: redirecting output to log");
+			LOG(DEBUG_,"RunMainLoop: redirecting output to log");
 
 			// (re-)open the log files.
 			fs::path logfile = fs::path(M6Config::GetDirectory("log")) / "access.log";
@@ -3797,7 +3798,7 @@ void RunMainLoop(uint32 inNrOfThreads, bool redirectOutputToLog)
 			OpenLogFile(logfile.string(), errfile.string());
 		}
 
-		LOG(DEBUG,"RunMainLoop: importing namespaces");
+		LOG(DEBUG_,"RunMainLoop: importing namespaces");
 
 		using namespace boost::local_time;
 		using namespace boost::posix_time;
@@ -3807,12 +3808,12 @@ void RunMainLoop(uint32 inNrOfThreads, bool redirectOutputToLog)
 		cerr << local_date_time(second_clock::local_time(), time_zone_ptr())
 			 << " Restarting services...";
 
-		LOG(DEBUG,"RunMainLoop: blocking signals");
+		LOG(DEBUG_,"RunMainLoop: blocking signals");
 
 		M6SignalCatcher catcher;
 		catcher.BlockSignals();
 
-		LOG(DEBUG,"RunMainLoop: get config");
+		LOG(DEBUG_,"RunMainLoop: get config");
 	
 		const zx::element* config = M6Config::GetServer();
 		if (config == nullptr)
@@ -3824,11 +3825,11 @@ void RunMainLoop(uint32 inNrOfThreads, bool redirectOutputToLog)
 		if (port.empty())
 			port = "80";
 		
-		LOG(DEBUG,"RunMainLoop: configuring server");
+		LOG(DEBUG_,"RunMainLoop: configuring server");
 
 		shared_ptr<M6Server> server(new M6Server(config));
 
-		LOG(DEBUG,"RunMainLoop: binding server to %s:%s",addr.c_str(),port.c_str());
+		LOG(DEBUG_,"RunMainLoop: binding server to %s:%s",addr.c_str(),port.c_str());
 	
 		server->bind(addr, boost::lexical_cast<uint16>(port));
 		boost::thread thread(boost::bind(&zeep::http::server::run, boost::ref(*server), inNrOfThreads));
@@ -3837,11 +3838,11 @@ void RunMainLoop(uint32 inNrOfThreads, bool redirectOutputToLog)
 			 << local_date_time(second_clock::local_time(), time_zone_ptr())
 			 << " listening at " << addr << ':' << port << endl;
 		
-		LOG(DEBUG,"RunMainLoop: unblocking signals");
+		LOG(DEBUG_,"RunMainLoop: unblocking signals");
 
 		catcher.UnblockSignals();
 
-		LOG(DEBUG,"RunMainLoop: waiting for signals..");
+		LOG(DEBUG_,"RunMainLoop: waiting for signals..");
 		
 		int sig;
 		do
@@ -3868,7 +3869,7 @@ void RunMainLoop(uint32 inNrOfThreads, bool redirectOutputToLog)
 
 		server->stop();
 
-		LOG(DEBUG,"RunMainLoop: stopped server");
+		LOG(DEBUG_,"RunMainLoop: stopped server");
 
 #ifdef BOOST_CHRONO_EXTENSIONS
 		if (not thread.try_join_for(boost::chrono::seconds(5)))
@@ -3880,7 +3881,7 @@ void RunMainLoop(uint32 inNrOfThreads, bool redirectOutputToLog)
 			thread.detach();
 		}
 
-		LOG(DEBUG,"RunMainLoop: ending iteration");
+		LOG(DEBUG_,"RunMainLoop: ending iteration");
 	
 		if (sig == SIGHUP)
 			continue;
@@ -3952,7 +3953,7 @@ int M6Server::Start(const string& inRunAs, const string& inPidFile, bool inForeg
 			acceptor.bind(endpoint);
 			acceptor.listen();
 
-			LOG(DEBUG,"M6Server::Start: listening at %s:%s",addr.c_str(),port.c_str());
+			LOG(DEBUG_,"M6Server::Start: listening at %s:%s",addr.c_str(),port.c_str());
 		}
 		catch (exception& e)
 		{
@@ -3961,7 +3962,7 @@ int M6Server::Start(const string& inRunAs, const string& inPidFile, bool inForeg
 
 		if (not inForeground)
         {
-			LOG(DEBUG,"M6Server::Start: deamonizing");
+			LOG(DEBUG_,"M6Server::Start: deamonizing");
 			Daemonize(runas, pidfile);
 		}
 
@@ -3978,14 +3979,14 @@ int M6Server::Start(const string& inRunAs, const string& inPidFile, bool inForeg
 		}
 	}
 
-	LOG(DEBUG,"M6Server::Start: returning result %d",result);
+	LOG(DEBUG_,"M6Server::Start: returning result %d",result);
 	
 	return result;
 }
 
 int M6Server::Stop(const string& inPidFile)
 {
-	LOG(DEBUG, "stop server called");
+	LOG(DEBUG_, "stop server called");
 
 	int result = 1;
 	
@@ -3997,7 +3998,7 @@ int M6Server::Stop(const string& inPidFile)
 
 	if (IsPIDFileForExecutable(pidfile))
 	{
-		LOG(DEBUG, "stopping daemon");
+		LOG(DEBUG_, "stopping daemon");
 
 		ifstream file(pidfile);
 		if (not file.is_open())

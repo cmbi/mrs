@@ -32,7 +32,7 @@ std::string M6LogLevel2String (const M6LogLevel level)
         case WARN:   return "WARN";
         case NOTICE: return "NOTICE";
         case INFO:   return "INFO";
-        case DEBUG:  return "DEBUG";
+        case DEBUG_:  return "DEBUG";
         default:     return "NOTSET";
     };
 }
@@ -53,7 +53,7 @@ M6LogLevel String2M6LogLevel (const std::string &s)
     else if (s == "INFO")
         return INFO;
     else if (s == "DEBUG")
-        return DEBUG;
+        return DEBUG_;
     else
         return NOTSET;
 }

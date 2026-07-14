@@ -315,5 +315,13 @@
       <info>http://mmcif.rcsb.org/</info>
       <source delete="true" fetch="rsync.wwpdb.org::ftp_data/structures/divided/mmCIF/" port="33444" recursive="true">mmCIF/????.cif.gz</source>
     </databank>
+    <databank enabled="true" fasta="true" id="alphafold-human" parser="mmcif" update="daily">
+      <name>Alphafold HUMAN</name>
+      <aliases>
+        <alias>alphafold-human</alias>
+      </aliases>
+      <info>https://www.alphafold.ebi.ac.uk/</info>
+      <source delete="false" fetch="" recursive="true">alphafold/UP000005640_9606_HUMAN_v4/AF-??????-*-model_v4.cif.gz</source>
+    </databank>
   </databanks>
 </mrs-config>

@@ -17,6 +17,7 @@
 #include <boost/thread.hpp>
 #include <boost/format.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/filesystem/directory.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/filter/zlib.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>

@@ -1419,6 +1419,12 @@ void M6Server::handle_search(const zh::request& request,
 		string db = request.get_parameter("db");
 		uint32 page = request.get_parameter("page", 1UL);
 
+	if (q.find("${") != string::npos)
+	{
+		reply = zh::reply::stock_reply(zh::bad_request);
+		return;
+	}
+
 	if (page < 1)
 		page = 1;
 
